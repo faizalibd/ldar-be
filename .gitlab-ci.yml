@@ -22,7 +22,7 @@ deploy_dev:
       - rm -rf ~/temp/ldar-be/DEV/ldar-be.tgz
       - scp -r ~/temp/ldar-be/DEV/. $SERVER_DEV:/web-source/ldar-be
       - rm -rf ~/temp/ldar-be/DEV/*
-    #  - ssh $SERVER_DEV "/usr/local/node/nodejs/bin/pm2 restart ldar_backend"
+      - ssh $SERVER_DEV "/usr/local/node/nodejs/bin/pm2 restart ldar_backend"
       - echo "Deploy server Development berhasil"
     only:
       - development
