@@ -1,0 +1,184 @@
+#!/usr/bin/env node
+var dotenv = require("dotenv");
+dotenv.config();
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('ldar-api:server'); // Change to whatever name of the api
+var http = require('http');
+
+const { oracle: database } = require("../app/database"); // Get database connection
+
+/**
+ * Start app
+ */
+
+let server;
+let port;
+
+async function startup() {
+  debug("Starting application ");
+
+  try {
+    debug("Initializing database");
+
+    await database.initialize();
+    Object.keys(database.connections).forEach((p) => {
+      debug("Creating pool " + p + "@" + database.connections[p]);
+    })
+
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  try {
+    debug("Initializing server");
+
+    /**
+     * Get port from environment and store in Express.
+     */
+    port = normalizePort(process.env.SERVER_PORT || "3000");
+    app.set("port", port);
+
+    /**
+     * Create HTTP server.
+     */
+
+    server = http.createServer(app);
+
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+
+    server.listen(port);
+    server.on("error", onError);
+    server.on("listening", onListening);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+}
+
+startup();
+
+/**
+ * Shutdown app
+ */
+
+async function shutdown(e) {
+  let err = e;
+  debug("Shutting down application");
+
+  try {
+    debug("Closing server");
+    server.close();
+  } catch (e) {
+    console.error(e);
+    err = err || e;
+  }
+
+  try {
+    debug("Closing database");
+
+    await database.close();
+    Object.keys(database.connections).forEach((p) => {
+      debug("Creating pool " + p + "@" + database.connections[p]);
+    })
+  } catch (e) {
+    console.error(e);
+    err = err || e;
+  }
+
+  debug("Exiting process");
+
+  if (err) {
+    process.exit(1);
+  } else {
+    process.exit(0);
+  }
+}
+
+process.once("SIGTERM", () => {
+  debug("Received SIGTERM");
+  shutdown();
+});
+
+process.once("SIGINT", () => {
+  debug("Received SIGINT");
+  shutdown();
+});
+
+process.once("SIGUSR2", () => {
+  debug("Received SIGUSR2");
+  shutdown();
+});
+
+process.once("uncaughtException", (err) => {
+  debug("Uncaught exception");
+  console.error(err);
+
+  shutdown(err);
+});
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
