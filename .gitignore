@@ -1,6 +1,7 @@
 # Custom
 *.key.pub
 !core/key/.gitkeep
+launch.json
 
 # Logs
 logs

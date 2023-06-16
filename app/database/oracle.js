@@ -63,16 +63,20 @@ async function execute(poolName, statement, binds, opts = {}) {
   }
 }
 
-const { reference } = require("./repositories");
+const { reference, transaction } = require("./repositories");
 
 const role_menu = new reference.role_menu({ execute });
+const user_role = new reference.user_role({ execute }, role_menu);
 const db = {
   reference: {
     approval_type: new reference.approval_type({ execute }),
     menu: new reference.menu({ execute }),
     role: new reference.role({ execute }),
     role_menu: role_menu,
-    user_role: new reference.user_role({ execute }, role_menu),
+    user_role: user_role,
+  },
+  transaction: {
+    ldar: new transaction.ldar({ execute }, user_role),
   },
 };
 

@@ -7,7 +7,7 @@ class UserRoleRepository {
     this.roleMenuRepo = roleMenuRepo;
   }
 
-  async get(nik, roleId, new_user, limit, offset) {
+  async get(nik, roleId, role, new_user, limit, offset) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -20,8 +20,12 @@ class UserRoleRepository {
         values.nik = nik;
       }
       if (roleId) {
-        condition += " AND I_ID_LDARROLE = :roleId";
+        condition += " AND B.I_ID_LDARROLE = :roleId";
         values.roleId = roleId;
+      }
+      if (role) {
+        condition += " AND B.N_ROLE = :role";
+        values.role = role;
       }
       if (limit) {
         rows = " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
@@ -50,21 +54,28 @@ class UserRoleRepository {
         response = users;
       }
     } else if (result && result.length > 0) {
-      if (nik && roleId) {
+      if (nik && (roleId || role)) {
         response = await api.info.employee.get(nik);
-        response[0].role = await this.roleMenuRepo.get(roleId);
+        if (response && response.length > 0) {
+          response[0].role = await this.roleMenuRepo.get(roleId, role);
+        }
       } else if (nik) {
         response = await api.info.employee.get(nik);
-        response[0].role = await Promise.all(
-          (
-            await this.getRole(nik)
-          ).map(async (r) => (await this.roleMenuRepo.get(r.id))[0])
-        );
-      } else if (roleId) {
-        response = await this.getRole("", roleId);
-        response[0].user = await Promise.all(
-          result.map(async (r) => (await api.info.employee.get(r.nik))[0])
-        );
+        if (response && response.length > 0) {
+          response[0].role = await Promise.all(
+            (
+              await this.getRole(nik)
+            ).map(async (r) => (await this.roleMenuRepo.get(r.id))[0])
+          );
+        }
+      } else if (roleId || role) {
+        response = await this.getRole("", roleId, role);
+
+        if (response && response.length > 0) {
+          response[0].user = await Promise.all(
+            result.map(async (r) => (await api.info.employee.get(r.nik))[0])
+          );
+        }
       } else {
         response = await Promise.all(
           result.map(async (r) => {
@@ -82,7 +93,7 @@ class UserRoleRepository {
     return response;
   }
 
-  async getRole(nik, roleId) {
+  async getRole(nik, roleId, role) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -94,6 +105,10 @@ class UserRoleRepository {
     if (roleId) {
       condition += " AND B.I_ID_LDARROLE = :roleId";
       values.roleId = roleId;
+    }
+    if (role) {
+      condition += " AND N_ROLE = :role";
+      values.role = role;
     }
 
     return (

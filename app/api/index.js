@@ -25,7 +25,9 @@ name.forEach(async (n, i) => {
       };
       break;
     case "bearer":
-      connection[n].config.authorization = "Bearer " + token[i];
+      if (token[i]) {
+        connection[n].config.authorization = "Bearer " + token[i];
+      }
       break;
   }
 });
@@ -36,12 +38,58 @@ const classApi = {
       api: require("./info/employee"),
     },
   },
+  engineering: {
+    model: {
+      api: require("./engineering/model"),
+    },
+  },
+  sap: {
+    referensi: {
+      api: require("./sap/referensi"),
+    },
+    customer: {
+      api: require("./sap/customer"),
+    },
+  },
+  siedm: {
+    drawing: {
+      api: require("./siedm/drawing"),
+    },
+  },
+  mta: {
+    ata: {
+      api: require("./mta/ata"),
+    },
+  },
 };
 
 const api = {
   info: {
     employee: new classApi.info.employee.api({
       connection: connection.info,
+    }),
+  },
+  engineering: {
+    model: new classApi.engineering.model.api({
+      connection: connection.engineering,
+    }),
+  },
+  sap: {
+    referensi: new classApi.sap.referensi.api({
+      connection: connection.sap,
+    }),
+    customer: new classApi.sap.customer.api({
+      connection: connection.sap,
+    }),
+  },
+  siedm: {
+    drawing: new classApi.siedm.drawing.api({
+      connection: connection.siedm,
+    }),
+  },
+  mta: {
+    ata: new classApi.mta.ata.api({
+      connection: connection.mta,
     }),
   },
 };

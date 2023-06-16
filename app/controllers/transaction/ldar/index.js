@@ -1,7 +1,9 @@
 const {
   oracle: { db },
-} = require("../../database");
-const { Messages, MessageProvider } = require("../../../core");
+} = require("../../../database");
+const { Messages, MessageProvider } = require("../../../../core");
+
+exports.approval = require("./approval");
 
 exports.get = async (req, res) => {
   let response = {
@@ -11,11 +13,25 @@ exports.get = async (req, res) => {
     message: MessageProvider.message(Messages.KEYS.SUCCESS),
   };
   try {
-    const result = await db.reference.user_role.get(
-      req.params.nik || req.query.nik,
-      req.query.roleId,
-      req.query.role,
-      req.query.new_user,
+    const result = await db.transaction.ldar.get(
+      req.params.id,
+      req.query.number,
+      req.query.modelCode,
+      req.query.nik,
+      req.query.submittedNik,
+      req.query.submittedDate,
+      req.query.LSNUnit,
+      req.query.EDMNik,
+      req.query.refCode,
+      req.query.refNumber,
+      req.query.PENik,
+      req.query.PEDate,
+      req.query.group,
+      req.query.version,
+      req.query.drawingNumber,
+      req.query.drawingIndex,
+      req.query.status,
+      req.query.statusDate,
       req.query.limit,
       req.query.offset
     );
@@ -23,7 +39,7 @@ exports.get = async (req, res) => {
       response.code = MessageProvider.status(Messages.KEYS.NOT_FOUND);
       response.message = MessageProvider.message(
         Messages.KEYS.NOT_FOUND,
-        "User Role"
+        "LDAR"
       );
     } else {
       response.data = result.length == 1 ? result[0] : result;
@@ -33,7 +49,7 @@ exports.get = async (req, res) => {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.ERROR,
-      "User Role"
+      "LDAR"
     )} ${error.message || error}`;
   }
   res.status(response.code).json(response);
@@ -43,17 +59,35 @@ exports.add = async (req, res) => {
   let response = {
     code: MessageProvider.status(Messages.KEYS.ADD_SUCCESS),
     data: null,
-    message: MessageProvider.message(Messages.KEYS.ADD_SUCCESS, "User Role"),
+    message: MessageProvider.message(Messages.KEYS.ADD_SUCCESS, "LDAR"),
   };
 
   try {
-    response.data = await db.reference.user_role.add(req);
+    response.data = await db.transaction.ldar.add(req);
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.ERROR,
-      "User Role"
+      "LDAR"
     )} ${error.message || error}`;
+  }
+  res.status(response.code).json(response);
+};
+
+exports.update = async (req, res) => {
+  let response = {
+    code: MessageProvider.status(Messages.KEYS.UPDATE_SUCCESS),
+    data: null,
+    message: MessageProvider.message(Messages.KEYS.UPDATE_SUCCESS, "LDAR"),
+  };
+  try {
+    response.data = await db.transaction.ldar.update(req);
+  } catch (error) {
+    response.code = MessageProvider.status(Messages.KEYS.ERROR);
+    response.message = `${MessageProvider.message(
+      Messages.KEYS.UPDATE_ERROR,
+      "LDAR"
+    )} - ${error.message || error}`;
   }
   res.status(response.code).json(response);
 };
@@ -62,16 +96,16 @@ exports.delete = async (req, res) => {
   let response = {
     code: MessageProvider.status(Messages.KEYS.DELETE_SUCCESS),
     data: null,
-    message: MessageProvider.message(Messages.KEYS.DELETE_SUCCESS, "User Role"),
+    message: MessageProvider.message(Messages.KEYS.DELETE_SUCCESS, "LDAR"),
   };
 
   try {
-    await db.reference.user_role.delete(req.body.nik, req.body.roleId);
+    await db.transaction.ldar.delete(req);
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.ERROR,
-      "User Role"
+      "LDAR"
     )} ${error.message || error}`;
   }
   res.status(response.code).json(response);

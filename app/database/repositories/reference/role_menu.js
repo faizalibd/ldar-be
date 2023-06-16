@@ -5,7 +5,7 @@ class RoleMenuRepository {
     this.db = db;
   }
 
-  async get(roleId, menuId, limit, offset) {
+  async get(roleId, role, menuId, limit, offset) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -14,6 +14,10 @@ class RoleMenuRepository {
     if (roleId) {
       condition += " AND B.I_ID_LDARROLE = :roleId";
       values.roleId = roleId;
+    }
+    if (role) {
+      condition += " AND N_ROLE = :role";
+      values.role = role;
     }
     if (menuId) {
       condition += " AND I_ID_LDARMENU = :menuId";
@@ -42,7 +46,9 @@ class RoleMenuRepository {
         response[0].menu = await this.checkChild(await this.getMenu(roleId));
       } else if (menuId) {
         response = await this.getMenu("", menuId);
-        response[0].role = result;
+        if (response) {
+          response[0].role = result;
+        }
       } else {
         response = await Promise.all(
           result.map(async (r) => {

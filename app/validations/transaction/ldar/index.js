@@ -1,0 +1,1245 @@
+const { body } = require("express-validator");
+const {
+  oracle: { db },
+} = require("../../../database");
+const { Messages, MessageProvider } = require("../../../../core");
+const { api } = require("../../../api");
+const apiValidation = process.env.API_VALIDATION === "TRUE";
+
+exports.approval = require("./approval");
+
+exports.add = [
+  body("model")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Model")
+    )
+    .bail()
+    .isLength({ max: 8 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Model", 8)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found =
+        !apiValidation ||
+        (await api.engineering.model.get(req.headers.authorization, val));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Model")
+        );
+      }
+
+      return true;
+    }),
+  body("phone")
+    .optional()
+    .isLength({ max: 15 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Phone", 15)
+    ),
+  body("location")
+    .optional()
+    .isLength({ max: 100 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Location", 100)
+    ),
+  body("refCode")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Reference Code")
+    )
+    .bail()
+    .isLength({ max: 1 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Reference Code", 1)
+    )
+    .bail()
+    .isIn(["1", "2", "3", "9"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "Reference Code",
+          "1 = RT; 2 = SOM; 3 = ELR; 9 = Other"
+        )
+    ),
+  body("refNumber")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Reference Number")
+    )
+    .bail()
+    .isLength({ max: 25 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.MAX_LENGTH,
+          "Reference Number",
+          25
+        )
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found;
+
+      found =
+        req.body.refCode == 9 ||
+        !apiValidation ||
+        (await api.sap.referensi.get(val, req.body.refCode));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Reference Number")
+        );
+      }
+
+      found =
+        (await db.transaction.ldar.exists(
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          req.body.refCode,
+          val
+        )) == 1;
+      if (found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.ALREADY_EXIST,
+              "Reference Number"
+            )
+        );
+      }
+
+      return true;
+    }),
+  body("drawingNumber")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Number")
+    )
+    .bail()
+    .isLength({ max: 50 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Number", 50)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found =
+        !apiValidation ||
+        (await api.siedm.drawing.get(
+          req.headers.authorization,
+          "",
+          val,
+          req.body.drawingIndex
+        ));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
+        );
+      }
+
+      return true;
+    }),
+  body("drawingIndex")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Index")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Index", 5)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found =
+        !apiValidation ||
+        (await api.siedm.drawing.get(
+          req.headers.authorization,
+          "",
+          req.body.drawingNumber,
+          val
+        ));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
+        );
+      }
+
+      return true;
+    }),
+  body("drawingDesignation")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Designation")
+    )
+    .bail()
+    .isLength({ max: 100 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.MAX_LENGTH,
+          "Drawing Designation",
+          100
+        )
+    ),
+  body("manHour")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Man Hour")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Man Hour")
+    )
+    .bail()
+    .isLength({ max: 2 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Man Hour", 2)
+    ),
+  body("entry")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found = await api.info.employee.get(val);
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+        );
+      }
+
+      return true;
+    }),
+];
+
+exports.update = [
+  body("id")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found = (await db.transaction.ldar.exists(val)) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+        );
+      }
+
+      return true;
+    }),
+  body("model")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Model")
+    )
+    .bail()
+    .isLength({ max: 8 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Model", 8)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found =
+        !apiValidation ||
+        (await api.engineering.model.get(req.headers.authorization, val));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Model")
+        );
+      }
+
+      return true;
+    }),
+  body("phone")
+    .optional()
+    .isLength({ max: 15 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Phone", 15)
+    ),
+  body("location")
+    .optional()
+    .isLength({ max: 100 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Location", 100)
+    ),
+  body("refCode")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Reference Code")
+    )
+    .bail()
+    .isLength({ max: 1 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Reference Code", 1)
+    )
+    .bail()
+    .isIn(["1", "2", "3", "9"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "Reference Code",
+          "1 = RT; 2 = SOM; 3 = ELR; 9 = Other"
+        )
+    ),
+  body("refNumber")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Reference Number")
+    )
+    .bail()
+    .isLength({ max: 25 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.MAX_LENGTH,
+          "Reference Number",
+          25
+        )
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found;
+
+      found =
+        req.body.refCode == 9 ||
+        !apiValidation ||
+        (await api.sap.referensi.get(val, req.body.refCode));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Reference Number")
+        );
+      }
+
+      found =
+        (await db.transaction.ldar.exists(
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          req.body.refCode,
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          req.body.id
+        )) == 1;
+      if (found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.ALREADY_EXIST,
+              "Reference Number"
+            )
+        );
+      }
+
+      return true;
+    }),
+  body("drawingNumber")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Number")
+    )
+    .bail()
+    .isLength({ max: 50 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Number", 50)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found =
+        !apiValidation ||
+        (await api.siedm.drawing.get(
+          req.headers.authorization,
+          "",
+          val,
+          req.body.drawingIndex
+        ));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
+        );
+      }
+
+      return true;
+    }),
+  body("drawingIndex")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Index")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Index", 5)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found =
+        !apiValidation ||
+        (await api.siedm.drawing.get(
+          req.headers.authorization,
+          "",
+          req.body.drawingNumber,
+          val
+        ));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
+        );
+      }
+
+      return true;
+    }),
+  body("drawingDesignation")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Designation")
+    )
+    .bail()
+    .isLength({ max: 100 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.MAX_LENGTH,
+          "Drawing Designation",
+          100
+        )
+    ),
+  body("manHour")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Man Hour")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Man Hour")
+    )
+    .bail()
+    .isLength({ max: 2 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Man Hour", 2)
+    ),
+  body("entry")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found = await api.info.employee.get(val);
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+        );
+      }
+
+      return true;
+    }),
+];
+
+exports.update_edm = [
+  body("id")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found = (await db.transaction.ldar.exists(val)) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+        );
+      }
+
+      return true;
+    }),
+  body("PENik")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK PE")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK PE", 6)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found = await api.info.employee.get(val);
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+        );
+      }
+
+      return true;
+    }),
+  body("group")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Group/Ata")
+    )
+    .bail()
+    .isLength({ max: 40 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Group/Ata", 40)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found =
+        !apiValidation ||
+        (await api.mta.ata.get(req.headers.authorization, "", val));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Group/Ata")
+        );
+      }
+
+      return true;
+    }),
+  body("entry")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found = await api.info.employee.get(val);
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+        );
+      }
+
+      return true;
+    }),
+];
+
+exports.update_pe_accepted = [
+  body("id")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found;
+
+      found =
+        (await db.transaction.ldar.exists(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "2"
+        )) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              "LDAR with Status 2"
+            )
+        );
+      }
+
+      return true;
+    }),
+  body("entry")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+    ),
+];
+
+exports.update_pe = [
+  body("id")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found;
+      found =
+        (await db.transaction.ldar.exists(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "3"
+        )) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              "LDAR with Status 3"
+            )
+        );
+      }
+
+      return true;
+    }),
+  body("acceptedReason")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Accepted Reason")
+    )
+    .bail()
+    .isLength({ max: 50 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Accepted Reason", 50)
+    ),
+  body("planningReview")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Planning Review")
+    )
+    .bail()
+    .isLength({ max: 300 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.MAX_LENGTH,
+          "Planning Review",
+          300
+        )
+    ),
+  body("drawingFlag")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "See Drawing Flag")
+    )
+    .bail()
+    .isLength({ max: 1 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "See Drawing Flag", 1)
+    )
+    .bail()
+    .isIn(["0", "1"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "See Drawing Flag",
+          "0 = False; 1 = True"
+        )
+    ),
+  body("otherFlag")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Other Flag")
+    )
+    .bail()
+    .isLength({ max: 1 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Other Flag", 1)
+    )
+    .bail()
+    .isIn(["0", "1"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "Other Flag",
+          "0 = False; 1 = True"
+        )
+    ),
+  body("reasonFlag")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "See Reason Flag")
+    )
+    .bail()
+    .isLength({ max: 1 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "See Reason Flag", 1)
+    )
+    .bail()
+    .isIn(["0", "1"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "See Reason Flag",
+          "0 = False; 1 = True"
+        )
+    ),
+  body("indicatedFlag")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Indicated Below Flag")
+    )
+    .bail()
+    .isLength({ max: 1 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.MAX_LENGTH,
+          "Indicated Below Flag",
+          1
+        )
+    )
+    .bail()
+    .isIn(["0", "1"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "Indicated Below Flag",
+          "0 = False; 1 = True"
+        )
+    ),
+  body("entry")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+    ),
+];
+
+exports.update_status = [
+  body("id")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let allowed;
+      let ref;
+      switch (req.body.status) {
+        case "1":
+          allowed = "0";
+          break;
+        case "2":
+          allowed = "1";
+          break;
+        case "4":
+          allowed = "3";
+          break;
+        case "5":
+          allowed = "4";
+          break;
+        case "6":
+          allowed = "4";
+          break;
+        case "7":
+          allowed = "5";
+          break;
+        case "8":
+          allowed = "6";
+          break;
+        case "9":
+          ref = "ELR";
+          allowed = "7";
+          break;
+        case "10":
+          ref = "ELR";
+          allowed = "7";
+          break;
+        case "11":
+          allowed = "7,8,9,10";
+          break;
+      }
+      let found =
+        (await db.transaction.ldar.exists(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ref,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          allowed
+        )) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              "LDAR with Status " +
+                allowed.split(",").join(", ") +
+                (ref ? " and Reference Document ELR" : "")
+            )
+        );
+      }
+
+      return true;
+    }),
+  body("status")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Status")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Status")
+    )
+    .bail()
+    .isLength({ max: 1 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Status", 1)
+    )
+    .bail()
+    .isIn(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "Statis",
+          "0 = Created; 1 = Submit to EDM; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by DE; 6 = Rejected by DE; 7 = Approved by PE; 8 = Rejected by PE; 9 = Accepted by AWO Panel; 10 = Rejected by AWO Panel; 11 = Closed"
+        )
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      if (val == 4) {
+        let valid = Array.isArray(req.body.de) && req.body.de.length > 0;
+
+        if (!valid) {
+          throw new Error(
+            MessageProvider.status(Messages.KEYS.MIN_ARRAY) +
+              "|" +
+              MessageProvider.message(
+                Messages.KEYS.MIN_ARRAY,
+                "Design Engineer List",
+                "1"
+              )
+          );
+        }
+
+        let seen = new Set();
+        valid = !req.body.de.some((p) => {
+          return seen.size === seen.add(p.nik).size;
+        });
+        if (!valid) {
+          throw new Error(
+            MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+              "|" +
+              "Duplicate Design Engineer"
+          );
+        }
+
+        valid = req.body.de.every((p) => {
+          return p.nik;
+        });
+        if (!valid) {
+          throw new Error(
+            MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+              "|" +
+              MessageProvider.message(
+                Messages.KEYS.NOT_EMPTY,
+                "Design Engineer NIK"
+              )
+          );
+        }
+
+        valid = req.body.de.every((p) => {
+          return p.nik.length <= 6;
+        });
+        if (!valid) {
+          throw new Error(
+            MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+              "|" +
+              MessageProvider.message(
+                Messages.KEYS.MAX_LENGTH,
+                "Design Engineer NIK",
+                6
+              )
+          );
+        }
+
+        valid = req.body.de.every(async (p) => {
+          return await api.info.employee.get(p.nik);
+        });
+        if (!valid) {
+          throw new Error(
+            MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+              "|" +
+              MessageProvider.message(
+                Messages.KEYS.NOT_FOUND,
+                "Employee (Design Engineer)"
+              )
+          );
+        }
+      }
+      return true;
+    }),
+  body("entry")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+    ),
+];
+
+exports.delete = [
+  body("id")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found = (await db.transaction.ldar.exists(val)) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+        );
+      }
+
+      return true;
+    }),
+];

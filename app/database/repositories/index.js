@@ -6,4 +6,7 @@ module.exports = {
     role_menu: require("./reference/role_menu"),
     user_role: require("./reference/user_role"),
   },
+  transaction: {
+    ldar: require("./transaction/ldar"),
+  },
 };

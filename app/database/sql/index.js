@@ -40,6 +40,33 @@ module.exports = {
       delete: sql("/reference/user_role/delete.sql"),
     },
   },
+  transaction: {
+    ldar: {
+      select: sql("/transaction/ldar/select.sql"),
+      exists: sql("/transaction/ldar/exists.sql"),
+      insert: sql("/transaction/ldar/insert.sql"),
+      update_eli: sql("/transaction/ldar/update_eli.sql"),
+      update_edm: sql("/transaction/ldar/update_edm.sql"),
+      update_pe_accepted: sql("/transaction/ldar/update_pe_accepted.sql"),
+      update_pe: sql("/transaction/ldar/update_pe.sql"),
+      update_status: sql("/transaction/ldar/update_status.sql"),
+      delete: sql("/transaction/ldar/delete.sql"),
+      approval: {
+        select: sql("/transaction/ldar/approval/select.sql"),
+        exists: sql("/transaction/ldar/approval/exists.sql"),
+        insert: sql("/transaction/ldar/approval/insert.sql"),
+        update: sql("/transaction/ldar/approval/update.sql"),
+        delete: sql("/transaction/ldar/approval/delete.sql"),
+      },
+      file: {
+        select: sql("/transaction/ldar/file/select.sql"),
+        exists: sql("/transaction/ldar/file/exists.sql"),
+        insert: sql("/transaction/ldar/file/insert.sql"),
+        update: sql("/transaction/ldar/file/update.sql"),
+        delete: sql("/transaction/ldar/file/delete.sql"),
+      },
+    },
+  },
 };
 
 function sql(file) {
