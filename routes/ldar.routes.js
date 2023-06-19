@@ -7,6 +7,11 @@ const { transaction: validation } = require("../app/validations");
 
 router.get("/approval", controller.ldar.approval.get);
 router.get("/approval/:id", controller.ldar.approval.get);
+router.get(
+  "/approval/:id/download",
+  validate(validation.ldar.approval.download),
+  controller.ldar.approval.download
+);
 router.post(
   "/approval",
   validate(validation.ldar.approval.add),
@@ -23,6 +28,31 @@ router.delete(
   "/approval",
   validate(validation.ldar.approval.delete),
   controller.ldar.approval.delete
+);
+
+router.get("/file", controller.ldar.file.get);
+router.get("/file/:id", controller.ldar.file.get);
+router.get(
+  "/file/:id/download",
+  validate(validation.ldar.file.download),
+  controller.ldar.file.download
+);
+router.post(
+  "/file",
+  validate(validation.ldar.file.add),
+  entry("insert"),
+  controller.ldar.file.add
+);
+router.put(
+  "/file",
+  validate(validation.ldar.file.update),
+  entry("update"),
+  controller.ldar.file.update
+);
+router.delete(
+  "/file",
+  validate(validation.ldar.file.delete),
+  controller.ldar.file.delete
 );
 
 router.get("/", controller.ldar.get);

@@ -1,13 +1,13 @@
 const { api } = require("../../../../api");
 const { transaction: sql } = require("../../../sql");
 const { email } = require("../../../../functions");
-const ApprovalRepository = require("./approval");
 
 class LDARRepository {
-  constructor(db, userRoleRepo) {
+  constructor(db, userRole, approval, file) {
     this.db = db;
-    this.userRoleRepo = userRoleRepo;
-    this.approval = new ApprovalRepository(db);
+    this.userRole = userRole;
+    this.approval = approval;
+    this.file = file;
   }
 
   async get(
@@ -290,7 +290,7 @@ class LDARRepository {
             to = (
               await Promise.all(
                 (
-                  await this.userRoleRepo.get("", "", "EDM")
+                  await this.userRole.get("", "", "EDM")
                 )[0].user.map(async (u) => {
                   return u.email;
                 })
@@ -323,7 +323,7 @@ class LDARRepository {
             to = (
               await Promise.all(
                 (
-                  await this.userRoleRepo.get("", "", "AWOP")
+                  await this.userRole.get("", "", "AWOP")
                 )[0].user.map(async (u) => {
                   return u.email;
                 })

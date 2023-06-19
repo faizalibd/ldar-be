@@ -67,6 +67,9 @@ const { reference, transaction } = require("./repositories");
 
 const role_menu = new reference.role_menu({ execute });
 const user_role = new reference.user_role({ execute }, role_menu);
+const ldar_approval = new transaction.approval({ execute });
+const ldar_file = new transaction.file({ execute });
+
 const db = {
   reference: {
     approval_type: new reference.approval_type({ execute }),
@@ -76,7 +79,12 @@ const db = {
     user_role: user_role,
   },
   transaction: {
-    ldar: new transaction.ldar({ execute }, user_role),
+    ldar: new transaction.ldar(
+      { execute },
+      user_role,
+      ldar_approval,
+      ldar_file
+    ),
   },
 };
 

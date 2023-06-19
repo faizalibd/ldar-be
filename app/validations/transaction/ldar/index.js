@@ -7,6 +7,7 @@ const { api } = require("../../../api");
 const apiValidation = process.env.API_VALIDATION === "TRUE";
 
 exports.approval = require("./approval");
+exports.file = require("./file");
 
 exports.add = [
   body("model")

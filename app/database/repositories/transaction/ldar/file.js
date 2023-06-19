@@ -79,23 +79,35 @@ class FileRepository {
     ).rows[0].ct;
   }
 
-  async add({ body: values }) {
+  async add({ body: values, file }) {
+    values.name = file.originalname;
+
     return await this.db
       .execute("dbapdm", sql.ldar.file.insert, values, { autoCommit: true })
-      .then(
-        async () =>
-          (
-            await this.get("", values.LDARId, values.name, values.group)
-          )[0]
-      )
+      .then(async () => {
+        let data = (
+          await this.get("", values.LDARId, values.name, values.group)
+        )[0];
+        create_file(join(dir, data.id), file);
+
+        return data;
+      })
       .catch((err) => {
         throw err;
       });
   }
 
-  async update({ body: values }) {
+  async update({ body: values, file }) {
+    values.name = file.originalname;
+    let data = (await this.get(values.id))[0];
+
     return await this.db
       .execute("dbapdm", sql.ldar.file.update, values, { autoCommit: true })
+      .then(async () => {
+        delete_file(join(dir, values.id), data.name).then(() => {
+          create_file(join(dir, values.id), file);
+        });
+      })
       .then(async () => (await this.get(values.id))[0])
       .catch((err) => {
         throw err;
@@ -103,10 +115,12 @@ class FileRepository {
   }
 
   async delete({ body: { id } }) {
+    let data = (await this.get(values.id))[0];
+
     await this.db
       .execute("dbapdm", sql.ldar.file.delete, { id: id }, { autoCommit: true })
       .then(async () => {
-        delete_file(join(dir, id), approval.file, true);
+        delete_file(join(dir, id), data.name, true);
       })
       .catch((err) => {
         throw err;
@@ -114,8 +128,8 @@ class FileRepository {
   }
 
   async download(id) {
-    let file = (await this.get(id))[0];
-    return download_file(join(dir, id), file.name);
+    let data = (await this.get(id))[0];
+    return download_file(join(dir, id), data.name);
   }
 }
 

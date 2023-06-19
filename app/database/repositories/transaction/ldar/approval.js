@@ -113,7 +113,7 @@ class ApprovalRepository {
   }
 
   async delete({ body: { id } }) {
-    var approval = (await this.get(id))[0];
+    var data = (await this.get(id))[0];
     await this.db
       .execute(
         "dbapdm",
@@ -122,7 +122,7 @@ class ApprovalRepository {
         { autoCommit: true }
       )
       .then(async () => {
-        delete_file(join(dir, id), approval.file, true);
+        delete_file(join(dir, id), data.file, true);
       })
       .catch((err) => {
         throw err;
@@ -130,8 +130,8 @@ class ApprovalRepository {
   }
 
   async download(id) {
-    let approval = (await this.get(id))[0];
-    return download_file(join(dir, id), approval.file);
+    let data = (await this.get(id))[0];
+    return download_file(join(dir, id), data.file);
   }
 }
 
