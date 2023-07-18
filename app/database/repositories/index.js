@@ -10,5 +10,6 @@ module.exports = {
     ldar: require("./transaction/ldar"),
     approval: require("./transaction/ldar/approval"),
     file: require("./transaction/ldar/file"),
+    drawing: require("./transaction/ldar/drawing"),
   },
 };

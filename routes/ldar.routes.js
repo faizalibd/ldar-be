@@ -5,6 +5,26 @@ const { parse, entry } = require("../core/middlewares/jsonParser");
 const { transaction: controller } = require("../app/controllers");
 const { transaction: validation } = require("../app/validations");
 
+router.get("/drawing", controller.ldar.drawing.get);
+router.get("/drawing/:id", controller.ldar.drawing.get);
+router.post(
+  "/drawing",
+  //validate(validation.ldar.drawing.add),
+  entry("insert"),
+  controller.ldar.drawing.add
+);
+router.put(
+  "/drawing",
+  // validate(validation.ldar.drawing.update),
+  entry("update"),
+  controller.ldar.drawing.update
+);
+router.delete(
+  "/drawing",
+  // validate(validation.ldar.drawing.delete),
+  controller.ldar.drawing.delete
+);
+
 router.get("/approval", controller.ldar.approval.get);
 router.get("/approval/:id", controller.ldar.approval.get);
 router.get(

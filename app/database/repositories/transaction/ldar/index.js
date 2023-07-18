@@ -3,11 +3,12 @@ const { transaction: sql } = require("../../../sql");
 const { email } = require("../../../../functions");
 
 class LDARRepository {
-  constructor(db, userRole, approval, file) {
+  constructor(db, userRole, approval, file, drawing) {
     this.db = db;
     this.userRole = userRole;
     this.approval = approval;
     this.file = file;
+    this.drawing = drawing;
   }
 
   async get(

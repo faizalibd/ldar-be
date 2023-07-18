@@ -65,6 +65,13 @@ module.exports = {
         update: sql("/transaction/ldar/file/update.sql"),
         delete: sql("/transaction/ldar/file/delete.sql"),
       },
+      drawing: {
+        select: sql("/transaction/ldar/drawing/select.sql"),
+        exists: sql("/transaction/ldar/drawing/exists.sql"),
+        insert: sql("/transaction/ldar/drawing/insert.sql"),
+        update: sql("/transaction/ldar/drawing/update.sql"),
+        delete: sql("/transaction/ldar/drawing/delete.sql"),
+      },
     },
   },
 };

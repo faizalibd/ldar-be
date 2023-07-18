@@ -69,6 +69,7 @@ const role_menu = new reference.role_menu({ execute });
 const user_role = new reference.user_role({ execute }, role_menu);
 const ldar_approval = new transaction.approval({ execute });
 const ldar_file = new transaction.file({ execute });
+const ldar_drawing = new transaction.drawing({ execute });
 
 const db = {
   reference: {
@@ -83,7 +84,8 @@ const db = {
       { execute },
       user_role,
       ldar_approval,
-      ldar_file
+      ldar_file,
+      ldar_drawing
     ),
   },
 };
