@@ -1,7 +1,7 @@
 const axios = require("axios").default;
 const { MessageProvider } = require("../../../core");
 
-let uri = "/zrest_api/ldarref";
+let uri = "/zrest_api/ldar/ref";
 
 class ReferensiApi {
   constructor({ connection }) {
@@ -21,15 +21,13 @@ class ReferensiApi {
         url += "&type=ELR";
         break;
     }
-
     return await axios
       .get(url, this.connection.config)
       .then(({ data }) => {
-        console.log(data);
         return data.info == "sukses" ? data.data : null;
       })
       .catch((error) => {
-        throw MessageProvider.api(error);
+        MessageProvider.api(error);
       });
   }
 }

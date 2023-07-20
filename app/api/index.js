@@ -26,7 +26,7 @@ name.forEach(async (n, i) => {
       break;
     case "bearer":
       if (token[i]) {
-        connection[n].config.authorization = "Bearer " + token[i];
+        connection[n].config.headers.authorization = "Bearer " + token[i];
       }
       break;
   }

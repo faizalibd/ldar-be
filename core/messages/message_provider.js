@@ -40,7 +40,7 @@ const status = (key) => {
 const api = (error) => {
   if (error.response) {
     // Request made and server responded
-    console.log(error.response);
+    console.log(error.response.data);
   } else if (error.request) {
     // The request was made but no response was received
     console.log(error.request);
@@ -48,7 +48,6 @@ const api = (error) => {
     // Something happened in setting up the request that triggered an Error
     console.log("Error", error.message);
   }
-  throw error;
 };
 
 const MessageProvider = {

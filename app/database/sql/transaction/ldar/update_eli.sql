@@ -1,7 +1,8 @@
 UPDATE DBAPDM.TMLDAR
 SET C_PGM_MODEL = :modelCode,
 	I_LDAR_PHONE = :phone,
-	C_LDAR_LSNUNIT = :LSNUnit,
+	-- N_LDAR_SUBMITBY = :submittedBy
+	-- C_LDAR_LSNUNIT = :LSNUnit,
 	A_LDAR_LOC = :location,
 	C_LDAR_REFBY = :refCode,
 	I_LDAR_REFBY = :refNumber,

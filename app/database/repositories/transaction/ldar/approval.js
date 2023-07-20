@@ -63,7 +63,7 @@ class ApprovalRepository {
       values.LDARId = LDARId;
     }
     if (typeCode) {
-      condition += " AND B.I_ID_LDARAPRVTYPE = :typeCode";
+      condition += " AND I_ID_LDARAPRVTYPE = :typeCode";
       values.typeCode = typeCode;
     }
     if (nik) {
@@ -74,6 +74,7 @@ class ApprovalRepository {
       condition += " AND I_ID_LDARAPRV != :idNot";
       values.idNot = idNot;
     }
+
     return (
       await this.db.execute(
         "dbapdm",
@@ -83,21 +84,27 @@ class ApprovalRepository {
     ).rows[0].ct;
   }
 
-  async add({ body: values }) {
-    return await this.add_func(values);
+  async add({ body: { nik, ...values } }) {
+    return await Promise.all(
+      nik.map((n) => {
+        return this.add_func({ nik: n, ...values });
+      })
+    );
   }
 
   async add_func(values) {
     return await this.db
-      .execute("dbapdm", sql.ldar.approval.insert, values, { autoCommit: true })
-      .then(async () => (await this.get("", values.LDARId, "0", values.nik))[0])
+      .execute("dbapdm", sql.ldar.approval.insert, values, {
+        autoCommit: true,
+      })
+      .then(async () => (await this.get("", values.LDARId, 0, values.nik))[0])
       .catch((err) => {
         throw err;
       });
   }
 
   async update({ body: values, file }) {
-    values.file = file ? file.originalname : "";
+    values.fileName = file ? file.originalname : "";
 
     return await this.db
       .execute("dbapdm", sql.ldar.approval.update, values, { autoCommit: true })
@@ -113,16 +120,29 @@ class ApprovalRepository {
   }
 
   async delete({ body: { id } }) {
-    var data = (await this.get(id))[0];
+    await this.delete_func(id);
+  }
+
+  async delete_func(id, LDARId, nik, file) {
+    let condition = " WHERE 1=1" + " AND I_ID_LDARAPRVTYPE = 0";
+    let values = {};
+    if (id) {
+      condition += " AND I_ID_LDARAPRV = :id";
+      values.id = id;
+    } else {
+      condition += " AND I_ID_LDAR = :LDARId AND I_LDAR_APRV = :nik";
+      values.LDARId = LDARId;
+      values.nik = nik;
+    }
+
     await this.db
-      .execute(
-        "dbapdm",
-        sql.ldar.approval.delete,
-        { id: id },
-        { autoCommit: true }
-      )
+      .execute("dbapdm", sql.ldar.approval.delete + condition, values, {
+        autoCommit: true,
+      })
       .then(async () => {
-        delete_file(join(dir, id), data.file, true);
+        if (id && file) {
+          delete_file(join(dir, id), file, true);
+        }
       })
       .catch((err) => {
         throw err;
@@ -131,7 +151,7 @@ class ApprovalRepository {
 
   async download(id) {
     let data = (await this.get(id))[0];
-    return download_file(join(dir, id), data.file);
+    return download_file(join(dir, id), data.fileName);
   }
 }
 

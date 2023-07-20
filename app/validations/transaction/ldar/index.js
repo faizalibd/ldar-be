@@ -10,7 +10,7 @@ exports.approval = require("./approval");
 exports.file = require("./file");
 
 exports.add = [
-  body("model")
+  body("modelCode")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -140,6 +140,20 @@ exports.add = [
 
       return true;
     }),
+  body("version")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Version")
+    )
+    .bail()
+    .isLength({ max: 25 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Version", 25)
+    ),
   body("drawingNumber")
     .notEmpty()
     .withMessage(
@@ -300,18 +314,40 @@ exports.update = [
     )
     .bail()
     .custom(async (val) => {
-      let found = (await db.transaction.ldar.exists(val)) == 1;
+      let found =
+        (await db.transaction.ldar.exists(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "0"
+        )) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              "LDAR with Status 0"
+            )
         );
       }
 
       return true;
     }),
-  body("model")
+  body("modelCode")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -450,6 +486,20 @@ exports.update = [
 
       return true;
     }),
+  body("version")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Version")
+    )
+    .bail()
+    .isLength({ max: 25 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Version", 25)
+    ),
   body("drawingNumber")
     .notEmpty()
     .withMessage(
@@ -570,20 +620,20 @@ exports.update = [
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
-    )
-    .bail()
-    .custom(async (val) => {
-      let found = await api.info.employee.get(val);
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
-        );
-      }
+    ),
+  // .bail()
+  // .custom(async (val) => {
+  //   let found = await api.info.employee.get(val);
+  //   if (!found) {
+  //     throw new Error(
+  //       MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+  //         "|" +
+  //         MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+  //     );
+  //   }
 
-      return true;
-    }),
+  //   return true;
+  // }),
 ];
 
 exports.update_edm = [
@@ -610,12 +660,34 @@ exports.update_edm = [
     )
     .bail()
     .custom(async (val) => {
-      let found = (await db.transaction.ldar.exists(val)) == 1;
+      let found =
+        (await db.transaction.ldar.exists(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "1"
+        )) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              "LDAR with Status 1"
+            )
         );
       }
 
@@ -637,18 +709,20 @@ exports.update_edm = [
     )
     .bail()
     .custom(async (val) => {
-      let found = await api.info.employee.get(val);
+      let found =
+        (await api.info.employee.get(val)) &&
+        (await db.reference.user_role.exists(val, "", "PE")) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (PE)")
         );
       }
 
       return true;
     }),
-  body("group")
+  body("groupAta")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -664,15 +738,29 @@ exports.update_edm = [
     )
     .bail()
     .custom(async (val, { req }) => {
-      let found =
-        !apiValidation ||
-        (await api.mta.ata.get(req.headers.authorization, "", val));
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Group/Ata")
+      let found;
+      if (apiValidation) {
+        let data = (await db.transaction.ldar.get(req.body.id))[0];
+        let program = (
+          await api.engineering.model.get(
+            req.headers.authorization,
+            data.modelCode
+          )
+        ).kode_program;
+
+        found = await api.mta.ata.get(
+          req.headers.authorization,
+          "",
+          program,
+          val
         );
+        if (!found) {
+          throw new Error(
+            MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+              "|" +
+              MessageProvider.message(Messages.KEYS.NOT_FOUND, "Group/Ata")
+          );
+        }
       }
 
       return true;
@@ -692,7 +780,7 @@ exports.update_edm = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
     )
     .bail()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       let found = await api.info.employee.get(val);
       if (!found) {
         throw new Error(
@@ -702,6 +790,16 @@ exports.update_edm = [
         );
       }
 
+      let EDM = (await db.transaction.ldar.get(req.body.id))[0].EDMNik;
+
+      found = !EDM || EDM == val;
+
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+            "|Already accepted by other EDM"
+        );
+      }
       return true;
     }),
 ];
@@ -824,7 +922,7 @@ exports.update_pe = [
           "",
           "",
           "",
-          "3"
+          "4"
         )) == 1;
       if (!found) {
         throw new Error(
@@ -832,7 +930,7 @@ exports.update_pe = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 3"
+              "LDAR with Status 4"
             )
         );
       }
@@ -1015,43 +1113,42 @@ exports.update_status = [
     )
     .bail()
     .custom(async (val, { req }) => {
+      let found;
       let allowed;
       let ref;
+      let user;
       switch (req.body.status) {
         case "1":
           allowed = "0";
+          user = "EDM";
           break;
         case "2":
           allowed = "1";
           break;
         case "4":
           allowed = "3";
+          user = "DE";
           break;
         case "5":
           allowed = "4";
+          user = "AWOP";
           break;
         case "6":
           allowed = "4";
           break;
         case "7":
+          ref = "3";
           allowed = "5";
           break;
         case "8":
-          allowed = "6";
+          ref = "3";
+          allowed = "5";
           break;
         case "9":
-          ref = "ELR";
-          allowed = "7";
-          break;
-        case "10":
-          ref = "ELR";
-          allowed = "7";
-          break;
-        case "11":
-          allowed = "7,8,9,10";
+          allowed = "5,6,7,8";
           break;
       }
-      let found =
+      found =
         (await db.transaction.ldar.exists(
           val,
           "",
@@ -1079,8 +1176,79 @@ exports.update_status = [
               Messages.KEYS.NOT_FOUND,
               "LDAR with Status " +
                 allowed.split(",").join(", ") +
-                (ref ? " and Reference Document ELR" : "")
+                (ref ? " and Reference ELR Document" : "")
             )
+        );
+      }
+
+      found =
+        !(req.body.status == 4) ||
+        (await db.transaction.ldar.approval.exists("", val));
+
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              `LDAR Approval (${user})`
+            )
+        );
+      }
+
+      // AWOP ref 1 = false
+      // AWOP ref 0 = true
+      // EDM ref X = false
+      found =
+        !user ||
+        !(
+          user != "AWOP" ||
+          (user == "AWOP" &&
+            (await db.transaction.ldar.exists(
+              val,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "3"
+            )) == 1)
+        ) ||
+        (await db.reference.user_role.exists("", "", user)) >= 1;
+
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              `Employee (${user})`
+            )
+        );
+      }
+
+      found =
+        !["5", "6"].includes(req.body.status) ||
+        (await db.transaction.ldar.approval.exists("", val, "0")) == 0;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
+            "|There's still approval to be done"
+        );
+      }
+
+      found =
+        !["5", "6"].includes(req.body.status) ||
+        (req.body.status == "5" &&
+          (await db.transaction.ldar.approval.exists("", val, "3")) == 1) ||
+        (req.body.status == "6" &&
+          (await db.transaction.ldar.approval.exists("", val, "4")) == 1);
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
+            "|Wrong approval status"
         );
       }
 
@@ -1108,90 +1276,16 @@ exports.update_status = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Status", 1)
     )
     .bail()
-    .isIn(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"])
+    .isIn(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
     .withMessage(
       MessageProvider.status(Messages.KEYS.IN) +
         "|" +
         MessageProvider.message(
           Messages.KEYS.IN,
-          "Statis",
-          "0 = Created; 1 = Submit to EDM; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by DE; 6 = Rejected by DE; 7 = Approved by PE; 8 = Rejected by PE; 9 = Accepted by AWO Panel; 10 = Rejected by AWO Panel; 11 = Closed"
+          "Status",
+          "0 = Created; 1 = Submit to EDM; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed"
         )
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      if (val == 4) {
-        let valid = Array.isArray(req.body.de) && req.body.de.length > 0;
-
-        if (!valid) {
-          throw new Error(
-            MessageProvider.status(Messages.KEYS.MIN_ARRAY) +
-              "|" +
-              MessageProvider.message(
-                Messages.KEYS.MIN_ARRAY,
-                "Design Engineer List",
-                "1"
-              )
-          );
-        }
-
-        let seen = new Set();
-        valid = !req.body.de.some((p) => {
-          return seen.size === seen.add(p.nik).size;
-        });
-        if (!valid) {
-          throw new Error(
-            MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-              "|" +
-              "Duplicate Design Engineer"
-          );
-        }
-
-        valid = req.body.de.every((p) => {
-          return p.nik;
-        });
-        if (!valid) {
-          throw new Error(
-            MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-              "|" +
-              MessageProvider.message(
-                Messages.KEYS.NOT_EMPTY,
-                "Design Engineer NIK"
-              )
-          );
-        }
-
-        valid = req.body.de.every((p) => {
-          return p.nik.length <= 6;
-        });
-        if (!valid) {
-          throw new Error(
-            MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-              "|" +
-              MessageProvider.message(
-                Messages.KEYS.MAX_LENGTH,
-                "Design Engineer NIK",
-                6
-              )
-          );
-        }
-
-        valid = req.body.de.every(async (p) => {
-          return await api.info.employee.get(p.nik);
-        });
-        if (!valid) {
-          throw new Error(
-            MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-              "|" +
-              MessageProvider.message(
-                Messages.KEYS.NOT_FOUND,
-                "Employee (Design Engineer)"
-              )
-          );
-        }
-      }
-      return true;
-    }),
+    ),
   body("entry")
     .notEmpty()
     .withMessage(

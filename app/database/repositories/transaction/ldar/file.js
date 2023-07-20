@@ -88,7 +88,7 @@ class FileRepository {
         let data = (
           await this.get("", values.LDARId, values.name, values.group)
         )[0];
-        create_file(join(dir, data.id), file);
+        create_file(join(dir, data.id, data.group), file);
 
         return data;
       })
@@ -104,8 +104,8 @@ class FileRepository {
     return await this.db
       .execute("dbapdm", sql.ldar.file.update, values, { autoCommit: true })
       .then(async () => {
-        delete_file(join(dir, values.id), data.name).then(() => {
-          create_file(join(dir, values.id), file);
+        delete_file(join(dir, values.id, data.group), data.name).then(() => {
+          create_file(join(dir, values.id, data.group), file);
         });
       })
       .then(async () => (await this.get(values.id))[0])
@@ -120,7 +120,7 @@ class FileRepository {
     await this.db
       .execute("dbapdm", sql.ldar.file.delete, { id: id }, { autoCommit: true })
       .then(async () => {
-        delete_file(join(dir, id), data.name, true);
+        delete_file(join(dir, id, data.group), data.name, true);
       })
       .catch((err) => {
         throw err;
@@ -129,7 +129,7 @@ class FileRepository {
 
   async download(id) {
     let data = (await this.get(id))[0];
-    return download_file(join(dir, id), data.name);
+    return download_file(join(dir, id, data.group), data.name);
   }
 }
 

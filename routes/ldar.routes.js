@@ -1,5 +1,7 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
+const upload = multer();
 const { validate } = require("../core/middlewares/validator");
 const { parse, entry } = require("../core/middlewares/jsonParser");
 const { transaction: controller } = require("../app/controllers");
@@ -13,13 +15,15 @@ router.get(
   controller.ldar.approval.download
 );
 router.post(
-  "/approval",
-  validate(validation.ldar.approval.add),
+  "/approval/de",
+  parse("nik"),
+  validate(validation.ldar.approval.add_de),
   entry("insert"),
   controller.ldar.approval.add
 );
 router.put(
   "/approval",
+  upload.single("file"),
   validate(validation.ldar.approval.update),
   entry("update"),
   controller.ldar.approval.update
