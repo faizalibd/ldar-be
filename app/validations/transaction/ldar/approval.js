@@ -5,7 +5,7 @@ const {
 const { Messages, MessageProvider } = require("../../../../core");
 const { api } = require("../../../api");
 
-exports.add_de = [
+exports.add_awop = [
   body("LDARId")
     .notEmpty()
     .withMessage(
@@ -41,6 +41,7 @@ exports.add_de = [
           "",
           "",
           "",
+          "3",
           "",
           "",
           "",
@@ -48,8 +49,7 @@ exports.add_de = [
           "",
           "",
           "",
-          "",
-          "3"
+          "5"
         )) == 1;
       if (!found) {
         throw new Error(
@@ -57,12 +57,33 @@ exports.add_de = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 3"
+              "LDAR with Status 5 and ELR Document"
             )
         );
       }
 
-      found = (await db.transaction.ldar.approval.exists("", val)) >= 1;
+      return true;
+    }),
+  body("nik")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6)
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found;
+      found =
+        (await db.transaction.ldar.approval.exists("", req.body.LDARId, "0")) ==
+        1;
       if (found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
@@ -74,69 +95,18 @@ exports.add_de = [
         );
       }
 
+      found =
+        (await api.info.employee.get(val)) &&
+        (await db.reference.user_role.exists(val, "", "AWOP")) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
+        );
+      }
       return true;
     }),
-  body("nik").custom(async (val, { req }) => {
-    let valid = Array.isArray(val) && val.length > 0;
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.MIN_ARRAY) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.MIN_ARRAY, "NIK List", "1")
-      );
-    }
-
-    let seen = new Set();
-    valid = !val.some((d) => {
-      return seen.size === seen.add(d).size;
-    });
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-          "|" +
-          "Duplicate NIK"
-      );
-    }
-
-    valid = val.every((d) => {
-      return d != null && d != undefined && d != "";
-    });
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK")
-      );
-    }
-
-    valid = val.every((d) => {
-      return d.length <= 6;
-    });
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6)
-      );
-    }
-
-    valid = await Promise.all(
-      req.body.nik.map(async (d) => {
-        return (
-          (await api.info.employee.get(d)) &&
-          (await db.reference.user_role.exists(d, "", "DE")) == 1
-        );
-      })
-    ).then((arr) => arr.every((a) => a));
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
-      );
-    }
-    return true;
-  }),
   body("entry")
     .notEmpty()
     .withMessage(
@@ -179,7 +149,8 @@ exports.update = [
     .custom(async (val) => {
       let found;
 
-      found = (await db.transaction.ldar.approval.exists(val, "", "0")) == 1;
+      found = (await db.transaction.ldar.approval.exists(val)) == 1;
+      // found = (await db.transaction.ldar.approval.exists(val, "", "0")) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +

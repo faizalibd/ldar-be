@@ -272,7 +272,8 @@ class LDARRepository {
       });
   }
 
-  async update({ url, body: values }) {
+  async update({ url, body: { nik, remark, AWOPNik, ...values }, file }) {
+    let data;
     let query;
     let employee;
     switch (url) {
@@ -319,17 +320,18 @@ class LDARRepository {
             break;
           case "4":
             code = 3;
-            let approval = (await this.approval.get("", values.id)).map(
-              (a) => a.nik
-            );
             to = (
               await Promise.all(
-                approval.map(async (a) => {
-                  return (await api.info.employee.get(a))[0].email;
+                nik.map(async (n) => {
+                  await this.approval.add_func({
+                    LDARId: values.id,
+                    nik: n,
+                    insertUser: values.updateUser,
+                  });
+                  return (await api.info.employee.get(n))[0].email;
                 })
               )
             ).join(",");
-
             await this.approval.add_func({
               LDARId: values.id,
               nik: result.PENik,
@@ -337,24 +339,58 @@ class LDARRepository {
             });
             break;
           case "5":
+            data = (
+              await this.approval.get("", values.id, "", result.PENik)
+            )[0];
+            await this.approval.update_func(
+              {
+                id: data.id,
+                typeCode: "3",
+                remark: remark,
+                updateUser: values.updateUser,
+              },
+              file
+            );
             if (result.refCode == 3) {
-              // code = 4;
-              // to = (
-              //   await Promise.all(
-              //     (
-              //       await this.userRole.get("", "", "AWOP")
-              //     )[0].user.map(async (u) => {
-              //       return u.email;
-              //     })
-              //   )
-              // ).join(",");
+              await this.approval.add_func({
+                LDARId: values.id,
+                nik: AWOPNik,
+                insertUser: values.updateUser,
+              });
+              code = 4;
+              to = (await this.userRole.get(AWOPNik))[0].email;
             }
             break;
           case "6":
+            data = (
+              await this.approval.get("", values.id, "", result.PENik)
+            )[0];
+            await this.approval.update_func(
+              {
+                id: data.id,
+                typeCode: "4",
+                remark: remark,
+                updateUser: values.updateUser,
+              },
+              file
+            );
             code = 5;
             to = (await api.info.employee.get(result.EDMNik))[0].email;
             break;
           case "7":
+            data = (
+              await this.approval.get("", values.id, "", values.updateUser)
+            )[0];
+            console.log(data);
+            await this.approval.update_func(
+              {
+                id: data.id,
+                typeCode: "5",
+                remark: remark,
+                updateUser: values.updateUser,
+              },
+              file
+            );
             code = 6;
             to =
               (await api.info.employee.get(result.PENik))[0].email +
@@ -362,6 +398,18 @@ class LDARRepository {
               (await api.info.employee.get(result.EDMNik))[0].email;
             break;
           case "8":
+            data = (
+              await this.approval.get("", values.id, "", values.updateUser)
+            )[0];
+            await this.approval.update_func(
+              {
+                id: data.id,
+                typeCode: "6",
+                remark: remark,
+                updateUser: values.updateUser,
+              },
+              file
+            );
             code = 7;
             to =
               (await api.info.employee.get(result.PENik))[0].email +
@@ -375,7 +423,7 @@ class LDARRepository {
         }
 
         if (code) {
-          await this.email(code, to);
+          await this.email(code, to, result.number);
         }
 
         return result;
@@ -408,7 +456,7 @@ class LDARRepository {
       });
   }
 
-  async email(code, toParam) {
+  async email(code, toParam, number) {
     let from = process.env.EMAIL_FROM;
     let to = toParam;
     let cc;
@@ -418,42 +466,35 @@ class LDARRepository {
     switch (code) {
       case 1:
         subject = "New LDAR";
-        text =
-          "Engineering Liaison has been registered LDAR number xxx, please clarify & advise as soon as possible.";
+        text = `Engineering Liaison has been registered LDAR number ${number}, please clarify & advise as soon as possible.`;
         break;
       case 2:
         subject = "Email to PE (Assigned PE)";
-        text =
-          "LDAR No. xxxx has been created by Liaison Engineer, Please review & check LDAR No.xxxx.";
+        text = `LDAR No. ${number} has been created by Liaison Engineer, Please review & check LDAR No. ${number}.`;
         break;
       case 3:
         subject = "Email to DE (Assigned DE)";
-        text =
-          "PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.";
+        text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
         break;
       case 4:
         subject = "Email to AWO Panel (Approve PE)";
-        text =
-          "Problem on LDAR No.xxx has been evaluated, please completed LDAR No.xxx with justification.";
+        text = `Problem on LDAR No. ${number} has been evaluated, please completed LDAR No. ${number} with justification.`;
         break;
       case 5:
         subject = "Email to EDM (Reject PE)";
-        text =
-          "Problem on LDAR No.xxx has been completly checked, please release & distribution LDAR No.xxxx.";
+        text = `Problem on LDAR No. ${number} has been completly checked, please release & distribution LDAR No. ${number}.`;
         break;
       case 6:
         subject = "Email to PE & EDM (Approve AWO Panel)";
-        text =
-          "LDAR No.xxx has been completly checked, please see correction from design.";
+        text = `LDAR No. ${number} has been completly checked, please see correction from design.`;
         break;
       case 7:
         subject = "Email to PE & EDM (Reject AWO Panel)";
-        text = "LDAR No.xxx need review disposition, Please check and justify.";
+        text = `LDAR No. ${number} need review disposition, Please check and justify.`;
         break;
       case 8:
         subject = "Email to ELI (Closing)";
-        text =
-          "LDAR No.xxx has been completly checked, please use as a reference.";
+        text = `LDAR No. ${number} has been completly checked, please use as a reference.`;
         break;
     }
 

@@ -51,7 +51,7 @@ class ApprovalRepository {
     ).rows;
   }
 
-  async exists(id, LDARId, typeCode, nik, idNot) {
+  async exists(id, LDARId, typeCode, nik, idNot, nikNot) {
     let condition = " WHERE 1=1";
     let values = {};
     if (id) {
@@ -70,9 +70,13 @@ class ApprovalRepository {
       condition += " AND I_LDAR_APRV = :nik";
       values.nik = nik;
     }
-    if (idNot == 0 || idNot) {
+    if (idNot) {
       condition += " AND I_ID_LDARAPRV != :idNot";
       values.idNot = idNot;
+    }
+    if (nikNot) {
+      condition += " AND I_LDAR_APRV != :nikNot";
+      values.nikNot = nikNot;
     }
 
     return (
@@ -82,14 +86,6 @@ class ApprovalRepository {
         values
       )
     ).rows[0].ct;
-  }
-
-  async add({ body: { nik, ...values } }) {
-    return await Promise.all(
-      nik.map((n) => {
-        return this.add_func({ nik: n, ...values });
-      })
-    );
   }
 
   async add_func(values) {
@@ -104,6 +100,10 @@ class ApprovalRepository {
   }
 
   async update({ body: values, file }) {
+    return this.update_func(values, file);
+  }
+
+  async update_func(values, file) {
     values.fileName = file ? file.originalname : "";
 
     return await this.db

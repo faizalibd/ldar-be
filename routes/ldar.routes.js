@@ -14,13 +14,6 @@ router.get(
   validate(validation.ldar.approval.download),
   controller.ldar.approval.download
 );
-router.post(
-  "/approval/de",
-  parse("nik"),
-  validate(validation.ldar.approval.add_de),
-  entry("insert"),
-  controller.ldar.approval.add
-);
 router.put(
   "/approval",
   upload.single("file"),
@@ -69,6 +62,7 @@ router.post(
 );
 router.put(
   "/status",
+  upload.single("file"),
   validate(validation.ldar.update_status),
   entry("update"),
   controller.ldar.update

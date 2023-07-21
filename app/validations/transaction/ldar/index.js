@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, check } = require("express-validator");
 const {
   oracle: { db },
 } = require("../../../database");
@@ -1181,21 +1181,6 @@ exports.update_status = [
         );
       }
 
-      found =
-        !(req.body.status == 4) ||
-        (await db.transaction.ldar.approval.exists("", val));
-
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.NOT_FOUND,
-              `LDAR Approval (${user})`
-            )
-        );
-      }
-
       // AWOP ref 1 = false
       // AWOP ref 0 = true
       // EDM ref X = false
@@ -1229,26 +1214,22 @@ exports.update_status = [
         );
       }
 
+      let data = (await db.transaction.ldar.get(val))[0];
+
       found =
         !["5", "6"].includes(req.body.status) ||
-        (await db.transaction.ldar.approval.exists("", val, "0")) == 0;
+        (await db.transaction.ldar.approval.exists(
+          "",
+          val,
+          "0",
+          "",
+          "",
+          data.PENik
+        )) == 0;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
             "|There's still approval to be done"
-        );
-      }
-
-      found =
-        !["5", "6"].includes(req.body.status) ||
-        (req.body.status == "5" &&
-          (await db.transaction.ldar.approval.exists("", val, "3")) == 1) ||
-        (req.body.status == "6" &&
-          (await db.transaction.ldar.approval.exists("", val, "4")) == 1);
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
-            "|Wrong approval status"
         );
       }
 
@@ -1286,6 +1267,137 @@ exports.update_status = [
           "0 = Created; 1 = Submit to EDM; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed"
         )
     ),
+  body("nik").custom(async (val, { req }) => {
+    if (req.body.status == "4") {
+      let valid = Array.isArray(val) && val.length > 0;
+      if (!valid) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.MIN_ARRAY) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.MIN_ARRAY, "NIK List", "1")
+        );
+      }
+
+      let seen = new Set();
+      valid = !val.some((d) => {
+        return seen.size === seen.add(d).size;
+      });
+      if (!valid) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+            "|" +
+            "Duplicate NIK"
+        );
+      }
+
+      valid = val.every((d) => {
+        return d != null && d != undefined && d != "";
+      });
+      if (!valid) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK")
+        );
+      }
+
+      valid = val.every((d) => {
+        return d.length <= 6;
+      });
+      if (!valid) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6)
+        );
+      }
+
+      valid = await Promise.all(
+        req.body.nik.map(async (d) => {
+          return (
+            (await api.info.employee.get(d)) &&
+            (await db.reference.user_role.exists(d, "", "DE")) == 1
+          );
+        })
+      ).then((arr) => arr.every((a) => a));
+      if (!valid) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (DE)")
+        );
+      }
+    }
+    return true;
+  }),
+  body("remark").custom(async (val, { req }) => {
+    let valid = true;
+
+    valid =
+      !["5", "6", "7", "8"].includes(req.body.status) ||
+      !val ||
+      val.length <= 1000;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Remark", 1000)
+      );
+    }
+
+    return true;
+  }),
+  check("file").custom(async (val, { req }) => {
+    let valid = false;
+
+    valid =
+      !["5", "6", "7", "8"].includes(req.body.status) ||
+      !req.file ||
+      req.file.originalname.length <= 250;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "File", 250)
+      );
+    }
+
+    return true;
+  }),
+  body("AWOPNik").custom(async (val, { req }) => {
+    let valid = true;
+
+    valid = !(req.body.status == "5") || val;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.NOT_EMPTY, "AWOP Nik")
+      );
+    }
+    valid = !(req.body.status == "5") || val.length <= 6;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "AWOP Nik", 6)
+      );
+    }
+
+    valid =
+      !(req.body.status == "5") ||
+      ((await api.info.employee.get(val)) &&
+        (await db.reference.user_role.exists(val, "", "AWOP")) == 1);
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
+      );
+    }
+
+    return true;
+  }),
   body("entry")
     .notEmpty()
     .withMessage(
@@ -1299,7 +1411,31 @@ exports.update_status = [
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
-    ),
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let found;
+      found =
+        !["7", "8"].includes(req.body.status) ||
+        ((await api.info.employee.get(val)) &&
+          (await db.reference.user_role.exists(val, "", "AWOP")) == 1 &&
+          (await db.transaction.ldar.approval.exists(
+            "",
+            req.body.id,
+            "",
+            val
+          )) == 1);
+
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
+        );
+      }
+
+      return true;
+    }),
 ];
 
 exports.delete = [

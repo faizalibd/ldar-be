@@ -39,28 +39,6 @@ exports.get = async (req, res) => {
   res.status(response.code).json(response);
 };
 
-exports.add = async (req, res) => {
-  let response = {
-    code: MessageProvider.status(Messages.KEYS.ADD_SUCCESS),
-    data: null,
-    message: MessageProvider.message(
-      Messages.KEYS.ADD_SUCCESS,
-      "LDAR Approval"
-    ),
-  };
-
-  try {
-    response.data = await db.transaction.ldar.approval.add(req);
-  } catch (error) {
-    response.code = MessageProvider.status(Messages.KEYS.ERROR);
-    response.message = `${MessageProvider.message(
-      Messages.KEYS.ERROR,
-      "LDAR Approval"
-    )} ${error.message || error}`;
-  }
-  res.status(response.code).json(response);
-};
-
 exports.update = async (req, res) => {
   let response = {
     code: MessageProvider.status(Messages.KEYS.UPDATE_SUCCESS),
