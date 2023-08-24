@@ -29,6 +29,8 @@ class LDARRepository {
     drawingIndex,
     status,
     statusDate,
+    typeCode,
+    nikApproval,
     limit,
     offset
   ) {
@@ -38,7 +40,7 @@ class LDARRepository {
     let rows = "";
 
     if (id) {
-      condition += " AND I_ID_LDAR = :id";
+      condition += " AND A.I_ID_LDAR = :id";
       values.id = id;
     }
     if (number) {
@@ -51,15 +53,15 @@ class LDARRepository {
     }
     if (nik) {
       condition +=
-        " AND (I_ENTRY = :nik OR I_LDAR_TOSPV = :nik OR I_LDAR_ATTENTION = :nik)";
+        " AND (A.I_ENTRY = :nik OR I_LDAR_TOSPV = :nik OR I_LDAR_ATTENTION = :nik OR I_LDAR_APRV = :nik)";
       values.nik = nik;
     }
     if (submittedNik) {
-      condition += " AND I_ENTRY = :submittedNik";
+      condition += " AND A.I_ENTRY = :submittedNik";
       values.submittedNik = submittedNik;
     }
     if (submittedDate) {
-      condition += " AND TO_CHAR(D_ENTRY, 'YYYY-MM-DD') = :submittedDate";
+      condition += " AND TO_CHAR(A.D_ENTRY, 'YYYY-MM-DD') = :submittedDate";
       values.submittedDate = submittedDate;
     }
     if (LSNUnit) {
@@ -117,12 +119,20 @@ class LDARRepository {
       condition += " AND TO_CHAR(D_LDAR_STAT, 'YYYY-MM-DD') = :statusDate";
       values.statusDate = statusDate;
     }
+    if (typeCode) {
+      condition += " AND I_ID_LDARAPRVTYPE = :typeCode";
+      values.typeCode = typeCode;
+    }
+    if (nikApproval) {
+      condition += " AND I_LDAR_APRV = :nikApproval";
+      values.nikApproval = nikApproval;
+    }
     if (limit) {
       rows = " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
       values.offset = offset ? offset : 0;
       values.limit = limit;
     }
-
+    console.log(sql.ldar.select + condition + orderby + rows, values);
     return (
       await this.db.execute(
         "dbapdm",

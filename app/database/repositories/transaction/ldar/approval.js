@@ -25,7 +25,7 @@ class ApprovalRepository {
       values.id = id;
     }
     if (LDARId) {
-      condition += " AND I_ID_LDAR = :LDARId";
+      condition += " AND B.I_ID_LDAR = :LDARId";
       values.LDARId = LDARId;
     }
     if (typeCode) {

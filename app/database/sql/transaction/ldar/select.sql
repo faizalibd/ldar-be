@@ -1,9 +1,9 @@
-SELECT I_ID_LDAR "id",
+SELECT DISTINCT A.I_ID_LDAR "id",
 	I_LDAR "number",
 	C_PGM_MODEL "modelCode",
-	I_ENTRY "submittedNik",
+	A.I_ENTRY "submittedNik",
 	N_LDAR_SUBMITBY "submittedBy",
-	TO_CHAR(D_ENTRY, 'YYYY-MM-DD') "submittedDate",
+	TO_CHAR(A.D_ENTRY, 'YYYY-MM-DD') "submittedDate",
 	I_LDAR_PHONE "phone",
 	C_LDAR_LSNUNIT "LSNUnit",
 	A_LDAR_LOC "location",
@@ -29,4 +29,5 @@ SELECT I_ID_LDAR "id",
 	F_LDAR_INDICAT "indicatedFlag",
 	C_LDAR_STAT "status",
 	TO_CHAR(D_LDAR_STAT, 'YYYY-MM-DD') "statusDate"
-FROM DBAPDM.TMLDAR
+FROM DBAPDM.TMLDAR A
+	INNER JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR

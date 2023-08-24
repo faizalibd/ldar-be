@@ -33,6 +33,8 @@ exports.get = async (req, res) => {
       req.query.drawingIndex,
       req.query.status,
       req.query.statusDate,
+      req.query.typeCode,
+      req.query.nikApproval,
       req.query.limit,
       req.query.offset
     );
