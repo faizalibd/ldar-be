@@ -1462,12 +1462,34 @@ exports.delete = [
     )
     .bail()
     .custom(async (val) => {
-      let found = (await db.transaction.ldar.exists(val)) == 1;
+      let found =
+        (await db.transaction.ldar.exists(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "0"
+        )) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              "LDAR with Status 0"
+            )
         );
       }
 
