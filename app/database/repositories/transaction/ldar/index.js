@@ -120,8 +120,18 @@ class LDARRepository {
       values.statusDate = statusDate;
     }
     if (typeCode) {
-      condition += " AND I_ID_LDARAPRVTYPE = :typeCode";
-      values.typeCode = typeCode;
+      // condition += " AND I_ID_LDARAPRVTYPE = :typeCode";
+      // values.typeCode = typeCode;
+
+      condition +=
+        " AND I_ID_LDARAPRVTYPE IN (" +
+        typeCode
+          .split(",")
+          .map((d) => {
+            return "'" + d + "'";
+          })
+          .join(",") +
+        ")";
     }
     if (nikApproval) {
       condition += " AND I_LDAR_APRV = :nikApproval";
@@ -132,7 +142,6 @@ class LDARRepository {
       values.offset = offset ? offset : 0;
       values.limit = limit;
     }
-    console.log(sql.ldar.select + condition + orderby + rows, values);
     return (
       await this.db.execute(
         "dbapdm",
