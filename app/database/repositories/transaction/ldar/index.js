@@ -73,8 +73,17 @@ class LDARRepository {
       values.EDMNik = EDMNik;
     }
     if (refCode) {
-      condition += " AND C_LDAR_REFBY = :refCode";
-      values.refCode = refCode;
+      // condition += " AND C_LDAR_REFBY = :refCode";
+      // values.refCode = refCode;
+      condition +=
+        " AND C_LDAR_REFBY IN (" +
+        refCode
+          .split(",")
+          .map((d) => {
+            return "'" + d + "'";
+          })
+          .join(",") +
+        ")";
     }
     if (refNumber) {
       condition += " AND I_LDAR_REFBY LIKE '%' || :refNumber || '%'";
@@ -208,8 +217,17 @@ class LDARRepository {
       values.EDMNik = EDMNik;
     }
     if (refCode) {
-      condition += " AND C_LDAR_REFBY = :refCode";
-      values.refCode = refCode;
+      // condition += " AND C_LDAR_REFBY = :refCode";
+      // values.refCode = refCode;
+      condition +=
+        " AND C_LDAR_REFBY IN (" +
+        refCode
+          .split(",")
+          .map((d) => {
+            return "'" + d + "'";
+          })
+          .join(",") +
+        ")";
     }
     if (refNumber) {
       condition += " AND I_LDAR_REFBY = :refNumber";
