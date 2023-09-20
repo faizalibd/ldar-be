@@ -1138,10 +1138,12 @@ exports.update_status = [
           break;
         case "7":
           ref = "3";
+          // ref = "1,2,9";
           allowed = "5";
           break;
         case "8":
           ref = "3";
+          // ref = "1,2,9";
           allowed = "5";
           break;
         case "9":
@@ -1199,6 +1201,7 @@ exports.update_status = [
               "",
               "",
               "3"
+              // "1,2,9"
             )) == 1)
         ) ||
         (await db.reference.user_role.exists("", "", user)) >= 1;
