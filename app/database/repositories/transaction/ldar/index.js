@@ -34,6 +34,9 @@ class LDARRepository {
     limit,
     offset
   ) {
+    let additionalSelect = "";
+    let from =
+      " FROM DBAPDM.TMLDAR A LEFT JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR ";
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -145,19 +148,25 @@ class LDARRepository {
     if (nikApproval) {
       condition += " AND I_LDAR_APRV = :nikApproval";
       values.nikApproval = nikApproval;
+      additionalSelect = ", NVL(B.I_ID_LDARAPRV, '') as \"approvalId\"";
     }
     if (limit) {
       rows = " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
       values.offset = offset ? offset : 0;
       values.limit = limit;
     }
-    return (
+    let result = (
       await this.db.execute(
         "dbapdm",
-        sql.ldar.select + condition + orderby + rows,
+        sql.ldar.select + additionalSelect + from + condition + orderby + rows,
         values
       )
     ).rows;
+
+    if (nikApproval) {
+    }
+
+    return result;
   }
 
   async exists(
