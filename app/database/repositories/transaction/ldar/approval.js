@@ -29,7 +29,7 @@ class ApprovalRepository {
       values.LDARId = LDARId;
     }
     if (typeCode) {
-      condition += " AND B.I_ID_LDARAPRVTYPE = :typeCode";
+      condition += " AND C.I_ID_LDARAPRVTYPE = :typeCode";
       values.typeCode = typeCode;
     }
     if (nik) {
