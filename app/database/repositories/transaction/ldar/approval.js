@@ -1,3 +1,4 @@
+const { api } = require("../../../../api");
 const { transaction: sql } = require("../../../sql");
 const {
   create_dir,
@@ -42,13 +43,19 @@ class ApprovalRepository {
       values.limit = limit;
     }
 
-    return (
-      await this.db.execute(
-        "dbapdm",
-        sql.ldar.approval.select + condition + orderby + rows,
-        values
-      )
-    ).rows;
+    return await Promise.all(
+      (
+        await this.db.execute(
+          "dbapdm",
+          sql.ldar.approval.select + condition + orderby + rows,
+          values
+        )
+      ).rows.map(async (r) => {
+        employee = await api.info.employee.get(r.nik);
+        r.nama = employee[0].nama;
+        return r;
+      })
+    );
   }
 
   async exists(id, LDARId, typeCode, nik, idNot, nikNot) {
