@@ -18,6 +18,7 @@ class ApprovalRepository {
   async get(id, LDARId, typeCode, nik, limit, offset) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
+    let employee;
     let values = {};
     let rows = "";
 
