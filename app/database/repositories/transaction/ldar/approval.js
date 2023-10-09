@@ -31,8 +31,15 @@ class ApprovalRepository {
       values.LDARId = LDARId;
     }
     if (typeCode) {
-      condition += " AND C.I_ID_LDARAPRVTYPE = :typeCode";
-      values.typeCode = typeCode;
+      condition +=
+        " AND C.I_ID_LDARAPRVTYPE IN (" +
+        typeCode
+          .split(",")
+          .map((d) => {
+            return "'" + d + "'";
+          })
+          .join(",") +
+        ")";
     }
     if (nik) {
       condition += " AND I_LDAR_APRV = :nik";
