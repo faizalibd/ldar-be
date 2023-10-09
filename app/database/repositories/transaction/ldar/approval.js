@@ -16,9 +16,9 @@ class ApprovalRepository {
   }
 
   async get(id, LDARId, typeCode, nik, limit, offset) {
+    const employees = await api.info.employee.get();
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
-    let employee;
     let values = {};
     let rows = "";
 
@@ -52,8 +52,10 @@ class ApprovalRepository {
           values
         )
       ).rows.map(async (r) => {
-        employee = await api.info.employee.get(r.nik);
-        r.nama = employee[0].nama;
+        let employee = employees.filter((employee) => {
+          return employee.nik == r.nik;
+        });
+        r.nama = employee && employee.length > 0 ? employee[0].nama : "-";
         return r;
       })
     );
