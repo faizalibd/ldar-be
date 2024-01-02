@@ -154,113 +154,6 @@ exports.add = [
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Version", 25)
     ),
-  body("drawingNumber")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Number")
-    )
-    .bail()
-    .isLength({ max: 50 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Number", 50)
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found =
-        !apiValidation ||
-        (await api.siedm.drawing.get(
-          req.headers.authorization,
-          "",
-          val,
-          req.body.drawingIndex
-        ));
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
-        );
-      }
-
-      return true;
-    }),
-  body("drawingIndex")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Index")
-    )
-    .bail()
-    .isLength({ max: 5 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Index", 5)
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found =
-        !apiValidation ||
-        (await api.siedm.drawing.get(
-          req.headers.authorization,
-          "",
-          req.body.drawingNumber,
-          val
-        ));
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
-        );
-      }
-
-      return true;
-    }),
-  body("drawingDesignation")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Designation")
-    )
-    .bail()
-    .isLength({ max: 100 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(
-          Messages.KEYS.MAX_LENGTH,
-          "Drawing Designation",
-          100
-        )
-    ),
-  body("manHour")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Man Hour")
-    )
-    .bail()
-    .isNumeric()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NUMERIC) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "Man Hour")
-    )
-    .bail()
-    .isLength({ max: 2 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Man Hour", 2)
-    ),
   body("entry")
     .notEmpty()
     .withMessage(
@@ -499,113 +392,6 @@ exports.update = [
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Version", 25)
-    ),
-  body("drawingNumber")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Number")
-    )
-    .bail()
-    .isLength({ max: 50 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Number", 50)
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found =
-        !apiValidation ||
-        (await api.siedm.drawing.get(
-          req.headers.authorization,
-          "",
-          val,
-          req.body.drawingIndex
-        ));
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
-        );
-      }
-
-      return true;
-    }),
-  body("drawingIndex")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Index")
-    )
-    .bail()
-    .isLength({ max: 5 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Index", 5)
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found =
-        !apiValidation ||
-        (await api.siedm.drawing.get(
-          req.headers.authorization,
-          "",
-          req.body.drawingNumber,
-          val
-        ));
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing")
-        );
-      }
-
-      return true;
-    }),
-  body("drawingDesignation")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Designation")
-    )
-    .bail()
-    .isLength({ max: 100 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(
-          Messages.KEYS.MAX_LENGTH,
-          "Drawing Designation",
-          100
-        )
-    ),
-  body("manHour")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Man Hour")
-    )
-    .bail()
-    .isNumeric()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NUMERIC) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "Man Hour")
-    )
-    .bail()
-    .isLength({ max: 2 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Man Hour", 2)
     ),
   body("entry")
     .notEmpty()
@@ -863,6 +649,96 @@ exports.update_pe_accepted = [
 
       return true;
     }),
+  body("entry")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+    ),
+];
+exports.update_pe_manhour = [
+  body("id")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+    )
+    .bail()
+    .isLength({ max: 5 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+    )
+    .bail()
+    .custom(async (val) => {
+      let found;
+
+      found =
+        (await db.transaction.ldar.exists(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "3"
+        )) == 1;
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.NOT_FOUND,
+              "LDAR with Status 3"
+            )
+        );
+      }
+
+      return true;
+    }),
+  body("manHour")
+    .optional()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Man Hour")
+    )
+    .bail()
+    .isLength({ max: 2 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Man Hour", 2)
+    ),
+
   body("entry")
     .notEmpty()
     .withMessage(
