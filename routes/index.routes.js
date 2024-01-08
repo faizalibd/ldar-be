@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 router.get("/", function (req, res, next) {
-  res.render("index", { title: "SIEDM API" });
+  res.render("index", { title: "LDAR API" });
 });
 
 module.exports = router;

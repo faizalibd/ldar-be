@@ -48,6 +48,7 @@ module.exports = {
       update_eli: sql("/transaction/ldar/update_eli.sql"),
       update_edm: sql("/transaction/ldar/update_edm.sql"),
       update_pe_accepted: sql("/transaction/ldar/update_pe_accepted.sql"),
+      update_pe_manhour: sql("/transaction/ldar/update_pe_manhour.sql"),
       update_pe: sql("/transaction/ldar/update_pe.sql"),
       update_status: sql("/transaction/ldar/update_status.sql"),
       delete: sql("/transaction/ldar/delete.sql"),

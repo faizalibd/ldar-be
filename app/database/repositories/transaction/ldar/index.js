@@ -342,6 +342,9 @@ class LDARRepository {
       case "/pe/accepted":
         query = sql.ldar.update_pe_accepted;
         break;
+      case "/pe/manhour":
+        query = sql.ldar.update_pe_manhour;
+        break;
       case "/status":
         let result = await this.updateStatus(values);
         let code;

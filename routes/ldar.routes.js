@@ -74,6 +74,12 @@ router.put(
   controller.ldar.update
 );
 router.put(
+  "/pe/manhour",
+  validate(validation.ldar.update_pe_manhour),
+  entry("update"),
+  controller.ldar.update
+);
+router.put(
   "/pe",
   validate(validation.ldar.update_pe),
   entry("update"),
