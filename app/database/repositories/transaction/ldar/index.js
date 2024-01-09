@@ -328,6 +328,8 @@ class LDARRepository {
         // values.submittedBy = employee[0].nama;
         // values.LSNUnit = employee[0].organisasi;
         query = sql.ldar.update_eli;
+        values.remark = remark;
+
         break;
       case "/edm":
         employee = await api.info.employee.get(values.PENik);
@@ -479,7 +481,7 @@ class LDARRepository {
       default:
         return false;
     }
-
+    console.log(query, values);
     return await this.db
       .execute("dbapdm", query, values, { autoCommit: true })
       .then(async () => (await this.get(values.id))[0])

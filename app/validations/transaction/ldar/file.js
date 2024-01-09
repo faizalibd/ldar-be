@@ -53,8 +53,7 @@ exports.add = [
           MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR File")
       );
     }
-
-    valid = req.file.originalname <= 80;
+    valid = req.file.originalname.length <= 80;
     if (!valid) {
       throw new Error(
         MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
@@ -68,7 +67,7 @@ exports.add = [
         "",
         req.body.LDARId,
         req.file.originalname,
-        req.body.group
+        req.body.groups
       )) == 0;
     if (!valid) {
       throw new Error(
@@ -80,26 +79,26 @@ exports.add = [
 
     return true;
   }),
-  body("group")
+  body("groups")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Group")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Groups")
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "Group")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Groups")
     )
     .bail()
     .isLength({ max: 1 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Group", 1)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Groups", 1)
     ),
   body("entry")
     .notEmpty()
@@ -180,7 +179,7 @@ exports.update = [
         "",
         data.LDARId,
         req.file.originalname,
-        data.group,
+        data.groups,
         req.body.id
       )) == 0;
     if (!valid) {

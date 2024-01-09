@@ -15,7 +15,7 @@ exports.get = async (req, res) => {
       req.params.id,
       req.query.LDARId,
       req.query.name,
-      req.query.group,
+      req.query.groups,
       req.query.limit,
       req.query.offset
     );
@@ -47,7 +47,7 @@ exports.add = async (req, res) => {
   };
 
   try {
-    response.data = await db.transaction.ldar.approval.add(req);
+    response.data = await db.transaction.ldar.file.add(req);
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
@@ -65,7 +65,7 @@ exports.update = async (req, res) => {
     message: MessageProvider.message(Messages.KEYS.UPDATE_SUCCESS, "LDAR File"),
   };
   try {
-    response.data = await db.transaction.ldar.approval.update(req);
+    response.data = await db.transaction.ldar.file.update(req);
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
@@ -84,7 +84,7 @@ exports.delete = async (req, res) => {
   };
 
   try {
-    await db.transaction.ldar.approval.delete(req);
+    await db.transaction.ldar.file.delete(req);
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
@@ -102,7 +102,7 @@ exports.download = async (req, res) => {
     message: MessageProvider.message(Messages.KEYS.SUCCESS),
   };
   try {
-    res.download(await db.transaction.ldar.approval.download(req.params.id));
+    res.download(await db.transaction.ldar.file.download(req.params.id));
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(

@@ -14,7 +14,7 @@ class FileRepository {
     this.db = db;
   }
 
-  async get(id, LDARId, name, group, limit, offset) {
+  async get(id, LDARId, name, groups, limit, offset) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -29,12 +29,12 @@ class FileRepository {
       values.LDARId = LDARId;
     }
     if (name) {
-      condition += " AND B.N_LDAR_FILENAME = :name";
+      condition += " AND N_LDAR_FILENAME = :name";
       values.name = name;
     }
-    if (group) {
-      condition += " AND C_LDAR_FILEGRP = :group";
-      values.group = group;
+    if (groups) {
+      condition += " AND C_LDAR_FILEGRP = :groups";
+      values.groups = groups;
     }
     if (limit) {
       rows = " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
@@ -51,7 +51,7 @@ class FileRepository {
     ).rows;
   }
 
-  async exists(id, LDARId, name, group, idNot) {
+  async exists(id, LDARId, name, groups, idNot) {
     let condition = " WHERE 1=1";
     let values = {};
     if (id) {
@@ -63,12 +63,12 @@ class FileRepository {
       values.LDARId = LDARId;
     }
     if (name) {
-      condition += " AND B.N_LDAR_FILENAME = :name";
+      condition += " AND N_LDAR_FILENAME = :name";
       values.name = name;
     }
-    if (group) {
-      condition += " AND C_LDAR_FILEGRP = :group";
-      values.group = group;
+    if (groups) {
+      condition += " AND C_LDAR_FILEGRP = :groups";
+      values.groups = groups;
     }
     if (idNot == 0 || idNot) {
       condition += " AND I_ID_LDARFILE != :idNot";
@@ -86,9 +86,12 @@ class FileRepository {
       .execute("dbapdm", sql.ldar.file.insert, values, { autoCommit: true })
       .then(async () => {
         let data = (
-          await this.get("", values.LDARId, values.name, values.group)
+          await this.get("", values.LDARId, values.name, values.groups)
         )[0];
-        create_file(join(dir, data.id, data.group), file);
+        create_file(
+          join(dir, data.id.toString(), data.groups.toString()),
+          file
+        );
 
         return data;
       })
@@ -104,8 +107,14 @@ class FileRepository {
     return await this.db
       .execute("dbapdm", sql.ldar.file.update, values, { autoCommit: true })
       .then(async () => {
-        delete_file(join(dir, values.id, data.group), data.name).then(() => {
-          create_file(join(dir, values.id, data.group), file);
+        delete_file(
+          join(dir, values.id.toString(), data.groups.toString()),
+          data.name
+        ).then(() => {
+          create_file(
+            join(dir, values.id.toString(), data.groups.toString()),
+            file
+          );
         });
       })
       .then(async () => (await this.get(values.id))[0])
@@ -120,7 +129,7 @@ class FileRepository {
     await this.db
       .execute("dbapdm", sql.ldar.file.delete, { id: id }, { autoCommit: true })
       .then(async () => {
-        delete_file(join(dir, id, data.group), data.name, true);
+        delete_file(join(dir, id, data.groups.toString()), data.name, true);
       })
       .catch((err) => {
         throw err;
@@ -129,7 +138,7 @@ class FileRepository {
 
   async download(id) {
     let data = (await this.get(id))[0];
-    return download_file(join(dir, id, data.group), data.name);
+    return download_file(join(dir, id, data.groups), data.name);
   }
 }
 

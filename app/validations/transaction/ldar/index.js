@@ -225,7 +225,7 @@ exports.update = [
           "",
           "",
           "",
-          "0"
+          "0,1,2,3"
         )) == 1;
       if (!found) {
         throw new Error(

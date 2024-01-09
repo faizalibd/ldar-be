@@ -36,12 +36,14 @@ router.get(
 );
 router.post(
   "/file",
+  upload.single("file"),
   validate(validation.ldar.file.add),
   entry("insert"),
   controller.ldar.file.add
 );
 router.put(
   "/file",
+  upload.single("file"),
   validate(validation.ldar.file.update),
   entry("update"),
   controller.ldar.file.update

@@ -11,16 +11,16 @@ exports.create_dir = (folder, dir) => {
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
   }
-
   return directory;
 };
 
 exports.create_file = (dir, file, file_originalname) => {
-  let upload_dir = this.create_dir("", dir);
-  let buffer = file.buffer;
-  let namafile = file_originalname ? file_originalname : file.originalname;
+  console.log(dir);
+  // let upload_dir = this.create_dir("", dir);
+  // let buffer = file.buffer;
+  // let namafile = file_originalname ? file_originalname : file.originalname;
 
-  fs.writeFileSync(join(upload_dir, namafile), buffer);
+  // fs.writeFileSync(join(upload_dir, namafile), buffer);
 };
 
 exports.delete_file = (dir, namafile, delete_folder) => {
