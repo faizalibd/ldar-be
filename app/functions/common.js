@@ -15,12 +15,12 @@ exports.create_dir = (folder, dir) => {
 };
 
 exports.create_file = (dir, file, file_originalname) => {
-  console.log(dir);
-  // let upload_dir = this.create_dir("", dir);
-  // let buffer = file.buffer;
-  // let namafile = file_originalname ? file_originalname : file.originalname;
+  // console.log(dir);
+  let upload_dir = this.create_dir("", dir);
+  let buffer = file.buffer;
+  let namafile = file_originalname ? file_originalname : file.originalname;
 
-  // fs.writeFileSync(join(upload_dir, namafile), buffer);
+  fs.writeFileSync(join(upload_dir, namafile), buffer);
 };
 
 exports.delete_file = (dir, namafile, delete_folder) => {

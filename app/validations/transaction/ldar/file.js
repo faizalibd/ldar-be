@@ -1,4 +1,4 @@
-const { body, check } = require("express-validator");
+const { body, check, param } = require("express-validator");
 const {
   oracle: { db },
 } = require("../../../database");
@@ -246,7 +246,7 @@ exports.delete = [
 ];
 
 exports.download = [
-  body("id")
+  param("id")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -271,24 +271,21 @@ exports.download = [
     .custom(async (val) => {
       let found;
 
-      found = (await db.transaction.ldar.approval.exists(val)) == 1;
+      found = (await db.transaction.ldar.file.exists(val)) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR File")
         );
       }
 
-      found = await db.transaction.ldar.approval.download(val);
+      found = await db.transaction.ldar.file.download(val);
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(
-              Messages.KEYS.NOT_FOUND,
-              "LDAR Approval File"
-            )
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR File")
         );
       }
 

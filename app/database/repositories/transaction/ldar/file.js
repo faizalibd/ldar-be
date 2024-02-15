@@ -138,7 +138,11 @@ class FileRepository {
 
   async download(id) {
     let data = (await this.get(id))[0];
-    return download_file(join(dir, id, data.groups), data.name);
+
+    return download_file(
+      join(dir, id.toString(), data.groups.toString()),
+      data.name
+    );
   }
 }
 
