@@ -164,8 +164,7 @@ exports.update = [
           MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR File")
       );
     }
-
-    valid = req.file.originalname <= 80;
+    valid = req.file.originalname.length <= 80;
     if (!valid) {
       throw new Error(
         MessageProvider.status(Messages.KEYS.MAX_LENGTH) +

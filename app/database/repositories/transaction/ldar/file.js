@@ -110,14 +110,16 @@ class FileRepository {
         delete_file(
           join(dir, values.id.toString(), data.groups.toString()),
           data.name
-        ).then(() => {
-          create_file(
-            join(dir, values.id.toString(), data.groups.toString()),
-            file
-          );
-        });
+        );
+
+        create_file(
+          join(dir, values.id.toString(), data.groups.toString()),
+          file
+        );
       })
-      .then(async () => (await this.get(values.id))[0])
+      .then(async () => {
+        return (await this.get(values.id))[0];
+      })
       .catch((err) => {
         throw err;
       });
