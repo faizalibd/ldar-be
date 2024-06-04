@@ -36,7 +36,13 @@ class LDARRepository {
   ) {
     let additionalSelect = "";
     let from =
-      " FROM DBAPDM.TMLDAR A LEFT JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR ";
+      ` FROM DBAPDM.TMLDAR A LEFT JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR 
+      LEFT JOIN DBAPDM.TMLDARFILE C ON
+      A.I_ID_LDAR = C.I_ID_LDAR
+      AND C.C_LDAR_FILEGRP = '1'
+      LEFT JOIN DBAPDM.TMLDARFILE D ON
+      A.I_ID_LDAR = D.I_ID_LDAR
+      AND D.C_LDAR_FILEGRP = '2' `;
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -162,9 +168,6 @@ class LDARRepository {
         values
       )
     ).rows;
-
-    if (nikApproval) {
-    }
 
     return result;
   }

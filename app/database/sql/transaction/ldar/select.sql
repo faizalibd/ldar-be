@@ -29,4 +29,12 @@ SELECT DISTINCT A.I_ID_LDAR "id",
 	F_LDAR_RSN "reasonFlag",
 	F_LDAR_INDICAT "indicatedFlag",
 	C_LDAR_STAT "status",
-	TO_CHAR(D_LDAR_STAT, 'YYYY-MM-DD') "statusDate"
+	TO_CHAR(D_LDAR_STAT, 'YYYY-MM-DD') "statusDate",
+	CASE
+		WHEN C.I_ID_LDARFILE IS NOT NULL THEN '1'
+		ELSE '0'
+	END "fileEli",
+	CASE
+		WHEN D.I_ID_LDARFILE IS NOT NULL THEN '1'
+		ELSE '0'
+	END "filePEDE"
