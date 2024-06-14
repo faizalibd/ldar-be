@@ -1372,6 +1372,15 @@ exports.delete = [
         );
       }
 
+      found = (await db.transaction.ldar.file.exists("", val)) > 0;
+      if (found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.RELATION_ERROR) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.RELATION_ERROR, "File")
+        );
+      }
+
       return true;
     }),
 ];
