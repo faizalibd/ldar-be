@@ -65,6 +65,7 @@ router.post(
 router.put(
   "/status",
   upload.single("file"),
+  parse("nik"),
   validate(validation.ldar.update_status),
   entry("update"),
   controller.ldar.update

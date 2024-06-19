@@ -21,7 +21,7 @@ exports.sendMail = (from, to, cc, subject, text, html) => {
   }
   transporter.sendMail(mail, (error, info) => {
     if (error) {
-      console.log(error);
+      // console.log(error);
     } else {
       console.log("Email sent: " + info.response);
     }

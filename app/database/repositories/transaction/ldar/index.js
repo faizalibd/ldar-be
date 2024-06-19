@@ -35,8 +35,7 @@ class LDARRepository {
     offset
   ) {
     let additionalSelect = "";
-    let from =
-      ` FROM DBAPDM.TMLDAR A LEFT JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR 
+    let from = ` FROM DBAPDM.TMLDAR A LEFT JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR 
       LEFT JOIN DBAPDM.TMLDARFILE C ON
       A.I_ID_LDAR = C.I_ID_LDAR
       AND C.C_LDAR_FILEGRP = '1'
@@ -435,7 +434,6 @@ class LDARRepository {
             data = (
               await this.approval.get("", values.id, "", values.updateUser)
             )[0];
-            console.log(data);
             await this.approval.update_func(
               {
                 id: data.id,
@@ -484,7 +482,6 @@ class LDARRepository {
       default:
         return false;
     }
-    console.log(query, values);
     return await this.db
       .execute("dbapdm", query, values, { autoCommit: true })
       .then(async () => (await this.get(values.id))[0])
