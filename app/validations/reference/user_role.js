@@ -141,7 +141,7 @@ exports.delete = [
         );
       }
 
-      found = (await db.reference.role_menu.exists(val, req.body.menuId)) >= 1;
+      found = (await db.reference.role_menu.exists(val)) >= 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
