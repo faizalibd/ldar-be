@@ -16,6 +16,7 @@ exports.get = async (req, res) => {
       req.query.LDARId,
       req.query.typeCode,
       req.query.nik,
+      req.query.role,
       req.query.limit,
       req.query.offset
     );

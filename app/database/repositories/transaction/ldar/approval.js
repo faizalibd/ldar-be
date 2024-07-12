@@ -15,7 +15,7 @@ class ApprovalRepository {
     this.db = db;
   }
 
-  async get(id, LDARId, typeCode, nik, limit, offset) {
+  async get(id, LDARId, typeCode, nik, role, limit, offset) {
     const employees = await api.info.employee.get();
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
@@ -44,6 +44,10 @@ class ApprovalRepository {
     if (nik) {
       condition += " AND I_LDAR_APRV = :nik";
       values.nik = nik;
+    }
+    if (role) {
+      condition += " AND E.N_ROLE = :role";
+      values.role = role;
     }
     if (limit) {
       rows = " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
