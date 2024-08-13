@@ -326,7 +326,7 @@ exports.delete = [
 ];
 
 exports.download = [
-  body("id")
+  param("id")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
