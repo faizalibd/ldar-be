@@ -1,4 +1,4 @@
-const { body, check } = require("express-validator");
+const { body, check, param } = require("express-validator");
 const {
   oracle: { db },
 } = require("../../../database");
