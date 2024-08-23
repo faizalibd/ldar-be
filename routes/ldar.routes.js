@@ -14,6 +14,12 @@ router.get(
   validate(validation.ldar.approval.download),
   controller.ldar.approval.download
 );
+router.post(
+  "/approval",
+  validate(validation.ldar.approval.add),
+  entry("insert"),
+  controller.ldar.approval.add
+);
 router.put(
   "/approval",
   upload.single("file"),

@@ -109,6 +109,10 @@ class ApprovalRepository {
     ).rows[0].ct;
   }
 
+  async add({ body: values }) {
+    return this.add_func(values);
+  }
+
   async add_func(values) {
     return await this.db
       .execute("dbapdm", sql.ldar.approval.insert, values, {
