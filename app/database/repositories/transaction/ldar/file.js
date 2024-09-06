@@ -126,7 +126,7 @@ class FileRepository {
   }
 
   async delete({ body: { id } }) {
-    let data = (await this.get(values.id))[0];
+    let data = (await this.get(id))[0];
 
     await this.db
       .execute("dbapdm", sql.ldar.file.delete, { id: id }, { autoCommit: true })
