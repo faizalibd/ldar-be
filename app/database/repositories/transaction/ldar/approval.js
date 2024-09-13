@@ -7,6 +7,7 @@ const {
   download_file,
 } = require("../../../../functions/common");
 const { join } = require("path");
+const { email } = require("../../../../functions");
 
 const dir = create_dir("Approval");
 
@@ -109,8 +110,21 @@ class ApprovalRepository {
     ).rows[0].ct;
   }
 
+  // INI FUNGSI UNTUK ADD DE DOANG CUY
   async add({ body: values }) {
-    return this.add_func(values);
+    let result = this.add_func(values);
+    let from = process.env.EMAIL_FROM;
+    let to = (await api.info.employee.get(values.nik))[0].email;
+    let cc;
+    let subject = "Email to DE (Assigned DE)";
+    let text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
+    
+    if (process.env.EMAIL == "FALSE") {
+      text += `<br/><br/> REAL TO EMAIL: ${to}`;
+      to = process.env.EMAIL_DUMMY;
+    }
+    email.sendMail(from, to, cc, subject, "", text);
+    return result;
   }
 
   async add_func(values) {
