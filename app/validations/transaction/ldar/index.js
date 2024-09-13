@@ -1007,7 +1007,6 @@ exports.update_status = [
           break;
         case "5":
           allowed = "4";
-          user = "AWOP";
           break;
         case "6":
           allowed = "4";
