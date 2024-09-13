@@ -708,7 +708,7 @@ exports.update_pe_manhour = [
           "",
           "",
           "",
-          "3"
+          "3,4"
         )) == 1;
       if (!found) {
         throw new Error(
@@ -716,7 +716,7 @@ exports.update_pe_manhour = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 3"
+              "LDAR with Status 3 or 4"
             )
         );
       }
