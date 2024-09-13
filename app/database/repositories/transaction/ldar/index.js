@@ -404,15 +404,15 @@ class LDARRepository {
               },
               file
             );
-            if (result.refCode == 3) {
-              await this.approval.add_func({
-                LDARId: values.id,
-                nik: AWOPNik,
-                insertUser: values.updateUser,
-              });
-              code = 4;
-              to = (await this.userRole.get(AWOPNik))[0].email;
-            }
+            // if (result.refCode == 3) {
+            //   await this.approval.add_func({
+            //     LDARId: values.id,
+            //     nik: AWOPNik,
+            //     insertUser: values.updateUser,
+            //   });
+            //   code = 4;
+            //   to = (await this.userRole.get(AWOPNik))[0].email;
+            // }
             break;
           case "6":
             data = (
