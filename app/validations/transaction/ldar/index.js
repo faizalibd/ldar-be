@@ -1242,40 +1242,40 @@ exports.update_status = [
 
     return true;
   }),
-  body("AWOPNik").custom(async (val, { req }) => {
-    let valid = true;
+  // body("AWOPNik").custom(async (val, { req }) => {
+  //   let valid = true;
 
-    valid = !(req.body.status == "5") || val;
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.NOT_EMPTY, "AWOP Nik")
-      );
-    }
-    valid = !(req.body.status == "5") || val.length <= 6;
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "AWOP Nik", 6)
-      );
-    }
+  //   valid = !(req.body.status == "5") || val;
+  //   if (!valid) {
+  //     throw new Error(
+  //       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+  //         "|" +
+  //         MessageProvider.message(Messages.KEYS.NOT_EMPTY, "AWOP Nik")
+  //     );
+  //   }
+  //   valid = !(req.body.status == "5") || val.length <= 6;
+  //   if (!valid) {
+  //     throw new Error(
+  //       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+  //         "|" +
+  //         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "AWOP Nik", 6)
+  //     );
+  //   }
 
-    valid =
-      !(req.body.status == "5") ||
-      ((await api.info.employee.get(val)) &&
-        (await db.reference.user_role.exists(val, "", "AWOP")) == 1);
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
-      );
-    }
+  //   valid =
+  //     !(req.body.status == "5") ||
+  //     ((await api.info.employee.get(val)) &&
+  //       (await db.reference.user_role.exists(val, "", "AWOP")) == 1);
+  //   if (!valid) {
+  //     throw new Error(
+  //       MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+  //         "|" +
+  //         MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
+  //     );
+  //   }
 
-    return true;
-  }),
+  //   return true;
+  // }),
   body("entry")
     .notEmpty()
     .withMessage(
