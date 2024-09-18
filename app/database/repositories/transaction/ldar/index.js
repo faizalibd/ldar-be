@@ -168,12 +168,15 @@ class LDARRepository {
       )
     ).rows;
 
-    return await Promise.all(
-      result.map(async (d) => {
-        d.unit = (await api.info.employee.get(d.EDMNik))[0].organisasi;
-        return d;
-      })
-    );
+    if (id) {
+      return await Promise.all(
+        result.map(async (d) => {
+          d.unit = (await api.info.employee.get(d.EDMNik))[0].organisasi;
+          return d;
+        })
+      );
+    }
+    return result;
   }
 
   async exists(
