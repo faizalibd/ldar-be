@@ -170,7 +170,7 @@ class LDARRepository {
 
     return await Promise.all(
       result.map(async (d) => {
-        d.unit = await api.info.employee.get(d.EDMNik);
+        d.unit = (await api.info.employee.get(d.EDMNik))[0].organisasi;
         return d;
       })
     );
