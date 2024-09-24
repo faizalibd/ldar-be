@@ -477,6 +477,7 @@ class LDARRepository {
               (await api.info.employee.get(result.EDMNik))[0].email;
             break;
           case "9":
+          case "10":
             code = 8;
             to = (await api.info.employee.get(result.submittedNik))[0].email;
             break;
