@@ -542,7 +542,7 @@ class LDARRepository {
         break;
       case 5:
         subject = "Email to EDM (Reject PE)";
-        text = `Problem on LDAR No. ${number} has been completly checked, please release & distribution LDAR No. ${number}.`;
+        text = `Problem on LDAR No. ${number} has been completely checked, please release & distribution LDAR No. ${number}.`;
         break;
       case 6:
         subject = "Email to PE & EDM (Approve AWO Panel)";
@@ -554,7 +554,7 @@ class LDARRepository {
         break;
       case 8:
         subject = "Email to ELI (Closing)";
-        text = `LDAR No. ${number} has been completly checked, please use as a reference.`;
+        text = `LDAR No. ${number} has been completely checked, please use as a reference.`;
         break;
     }
 
