@@ -42,8 +42,9 @@ class UserRoleRepository {
       )
     ).rows;
 
+    let users = await api.info.employee.get();
+
     if (new_user) {
-      let users = await api.info.employee.get();
       if (result) {
         response = users.filter((u) => {
           return !result.find((r) => {
@@ -73,19 +74,24 @@ class UserRoleRepository {
 
         if (response && response.length > 0) {
           response[0].user = await Promise.all(
-            result.map(async (r) => (await api.info.employee.get(r.nik))[0])
+            result.map(
+              async (r) =>
+                (await users?.filter((x) => x.nik == r.nik)[0]) ?? "Not Found"
+            )
           );
         }
       } else {
         response = await Promise.all(
           result.map(async (r) => {
-            let user = (await api.info.employee.get(r.nik))[0];
-            user.role = await Promise.all(
-              (
-                await this.getRole(r.nik)
-              ).map(async (rr) => (await this.roleMenuRepo.get(rr.id))[0])
-            );
-            return user;
+            let user = await users?.filter((x) => x.nik == r.nik)[0];
+            if (user) {
+              user.role = await Promise.all(
+                (
+                  await this.getRole(r.nik)
+                ).map(async (rr) => (await this.roleMenuRepo.get(rr.id))[0])
+              );
+            }
+            return user ?? "Not Found";
           })
         );
       }
@@ -120,7 +126,7 @@ class UserRoleRepository {
     ).rows;
   }
 
-  async exists(nik, roleId) {
+  async exists(nik, roleId, role) {
     let condition = " WHERE 1=1";
     let values = {};
     if (nik) {
@@ -128,8 +134,12 @@ class UserRoleRepository {
       values.nik = nik;
     }
     if (roleId) {
-      condition += " AND I_ID_LDARROLE = :roleId";
+      condition += " AND B.I_ID_LDARROLE = :roleId";
       values.roleId = roleId;
+    }
+    if (role) {
+      condition += " AND N_ROLE = :role";
+      values.role = role;
     }
     return (
       await this.db.execute("dbapdm", sql.user_role.exists + condition, values)

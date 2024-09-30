@@ -11,14 +11,13 @@ class EmployeeApi {
     let url = this.connection.host + uri + "?";
     url += nik ? `&nik=${nik}` : "";
     url += organization ? `&org=${organization}` : "";
-
     return await axios
       .get(url, this.connection.config)
       .then(({ data }) => {
         return data.info == "sukses" ? data.data : null;
       })
       .catch((error) => {
-        throw MessageProvider.api(error);
+        MessageProvider.api(error);
       });
   }
 }

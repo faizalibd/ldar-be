@@ -16,6 +16,7 @@ exports.get = async (req, res) => {
       req.query.LDARId,
       req.query.typeCode,
       req.query.nik,
+      req.query.role,
       req.query.limit,
       req.query.offset
     );
@@ -48,15 +49,14 @@ exports.add = async (req, res) => {
       "LDAR Approval"
     ),
   };
-
   try {
     response.data = await db.transaction.ldar.approval.add(req);
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
-      Messages.KEYS.ERROR,
+      Messages.KEYS.ADD_ERROR,
       "LDAR Approval"
-    )} ${error.message || error}`;
+    )} - ${error.message || error}`;
   }
   res.status(response.code).json(response);
 };

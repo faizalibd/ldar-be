@@ -1,9 +1,8 @@
-const { body, check } = require("express-validator");
+const { body, check, param } = require("express-validator");
 const {
   oracle: { db },
 } = require("../../../database");
 const { Messages, MessageProvider } = require("../../../../core");
-const { api } = require("../../../api");
 
 exports.add = [
   body("LDARId")
@@ -28,7 +27,7 @@ exports.add = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR ID", 5)
     )
     .bail()
-    .custom(async (val, { req }) => {
+    .custom(async (val) => {
       let found;
 
       found = (await db.transaction.ldar.exists(val)) == 1;
@@ -40,53 +39,67 @@ exports.add = [
         );
       }
 
-      found =
-        (await db.transaction.ldar.approval.exists(
-          "",
-          val,
-          "",
-          req.body.nik
-        )) == 1;
-      if (found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.ALREADY_EXIST,
-              "LDAR Approval"
-            )
-        );
-      }
-
       return true;
     }),
-  body("nik")
+  check("file").custom(async (val, { req }) => {
+    let valid = false;
+
+    valid = req.file;
+
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR File")
+      );
+    }
+    valid = req.file.originalname.length <= 80;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR File", 80)
+      );
+    }
+
+    valid =
+      (await db.transaction.ldar.file.exists(
+        "",
+        req.body.LDARId,
+        req.file.originalname,
+        req.body.groups
+      )) == 0;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "LDAR File")
+      );
+    }
+
+    return true;
+  }),
+  body("groups")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Groups")
     )
     .bail()
-    .isLength({ max: 6 })
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Groups")
+    )
+    .bail()
+    .isLength({ max: 1 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6)
-    )
-    .bail()
-    .custom(async (val) => {
-      let found = await api.info.employee.get(val);
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
-        );
-      }
-
-      return true;
-    }),
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Groups", 1)
+    ),
   body("entry")
     .notEmpty()
     .withMessage(
@@ -127,116 +140,52 @@ exports.update = [
     )
     .bail()
     .custom(async (val) => {
-      let found =
-        (await db.transaction.ldar.approval.exists(val, "", "0")) == 1;
+      let found = (await db.transaction.ldar.file.exists(val)) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR File")
         );
       }
 
       return true;
     }),
-  body("typeCode")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Approval Type Code")
-    )
-    .bail()
-    .isNumeric()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NUMERIC) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "Approval Type Code")
-    )
-    .bail()
-    .isLength({ max: 5 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(
-          Messages.KEYS.MAX_LENGTH,
-          "Approval Type Code",
-          5
-        )
-    )
-    .bail()
-    .custom(async (val) => {
-      let found;
-
-      found = val == "0";
-
-      if (found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.UNPROCESSABLE_ENTITY,
-              "Approval Type"
-            )
-        );
-      }
-
-      found = (await db.reference.approval_type.exists(val)) == 1;
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Approval Type")
-        );
-      }
-
-      found =
-        (await db.transaction.ldar.approval.exists(
-          "",
-          val,
-          "",
-          req.body.nik
-        )) == 1;
-      if (found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.ALREADY_EXIST,
-              "LDAR Approval"
-            )
-        );
-      }
-
-      return true;
-    }),
-  body("remark")
-    .optional()
-    .isLength({ max: 1000 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Remark", 1000)
-    ),
-  check("file").custom((val, { req }) => {
+  check("file").custom(async (val, { req }) => {
     let valid = false;
+    let data = (await db.transaction.ldar.file.get(req.body.id))[0];
 
-    // valid = req.file;
+    valid = req.file;
 
-    // if (!valid) {
-    //   throw new Error(
-    //     MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-    //       "|" +
-    //       MessageProvider.message(Messages.KEYS.NOT_EMPTY, "File")
-    //   );
-    // }
-
-    valid = !req.file || req.file.originalname <= 250;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR File")
+      );
+    }
+    valid = req.file.originalname.length <= 80;
     if (!valid) {
       throw new Error(
         MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
           "|" +
-          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "File", 100)
+          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR File", 80)
+      );
+    }
+
+    valid =
+      (await db.transaction.ldar.file.exists(
+        "",
+        data.LDARId,
+        req.file.originalname,
+        data.groups,
+        req.body.id
+      )) == 0;
+    if (!valid) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+          "|" +
+          MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "LDAR File")
       );
     }
 
@@ -282,12 +231,12 @@ exports.delete = [
     )
     .bail()
     .custom(async (val) => {
-      let found = (await db.transaction.ldar.approval.exists(val)) == 1;
+      let found = (await db.transaction.ldar.file.exists(val)) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR File")
         );
       }
 
@@ -296,7 +245,7 @@ exports.delete = [
 ];
 
 exports.download = [
-  body("id")
+  param("id")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -321,24 +270,21 @@ exports.download = [
     .custom(async (val) => {
       let found;
 
-      found = (await db.transaction.ldar.approval.exists(val)) == 1;
+      found = (await db.transaction.ldar.file.exists(val)) == 1;
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR File")
         );
       }
 
-      found = await db.transaction.ldar.approval.download(val);
+      found = await db.transaction.ldar.file.download(val);
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(
-              Messages.KEYS.NOT_FOUND,
-              "LDAR Approval File"
-            )
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR File")
         );
       }
 

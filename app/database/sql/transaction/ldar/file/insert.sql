@@ -8,7 +8,7 @@ INSERT INTO DBAPDM.TMLDARFILE (
 VALUES (
         :LDARId,
         :name,
-        :group,
+        :groups,
         :insertUser,
         CURRENT_DATE
     )

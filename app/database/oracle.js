@@ -27,7 +27,7 @@ async function initialize() {
           poolAlias: p,
         });
       } catch (err) {
-        console.log(p, err);
+        // console.log(p, err);
         throw err;
       }
     }

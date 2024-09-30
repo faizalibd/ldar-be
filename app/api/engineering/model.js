@@ -10,16 +10,15 @@ class ModelApi {
   async get(token, kode) {
     let url = this.connection.host + uri;
     url += kode ? `/${kode}` : "";
-    this.connection.config.authorization = "Bearer " + token;
+    this.connection.config.headers.authorization = token;
 
     return await axios
       .get(url, this.connection.config)
       .then(({ data }) => {
-        console.log(data);
-        return data.code == 200 ? data.data : null;
+        return data.data;
       })
       .catch((error) => {
-        throw MessageProvider.api(error);
+        MessageProvider.api(error);
       });
   }
 }

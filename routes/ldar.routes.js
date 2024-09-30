@@ -1,5 +1,7 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
+const upload = multer();
 const { validate } = require("../core/middlewares/validator");
 const { parse, entry } = require("../core/middlewares/jsonParser");
 const { transaction: controller } = require("../app/controllers");
@@ -40,6 +42,7 @@ router.post(
 );
 router.put(
   "/approval",
+  upload.single("file"),
   validate(validation.ldar.approval.update),
   entry("update"),
   controller.ldar.approval.update
@@ -59,12 +62,14 @@ router.get(
 );
 router.post(
   "/file",
+  upload.single("file"),
   validate(validation.ldar.file.add),
   entry("insert"),
   controller.ldar.file.add
 );
 router.put(
   "/file",
+  upload.single("file"),
   validate(validation.ldar.file.update),
   entry("update"),
   controller.ldar.file.update
@@ -85,6 +90,8 @@ router.post(
 );
 router.put(
   "/status",
+  upload.single("file"),
+  parse("nik"),
   validate(validation.ldar.update_status),
   entry("update"),
   controller.ldar.update
@@ -92,6 +99,12 @@ router.put(
 router.put(
   "/pe/accepted",
   validate(validation.ldar.update_pe_accepted),
+  entry("update"),
+  controller.ldar.update
+);
+router.put(
+  "/pe/manhour",
+  validate(validation.ldar.update_pe_manhour),
   entry("update"),
   controller.ldar.update
 );
