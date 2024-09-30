@@ -10,6 +10,7 @@ exports.get = async (req, res) => {
     data: null,
     message: MessageProvider.message(Messages.KEYS.SUCCESS),
   };
+
   try {
     const result = await db.transaction.ldar.drawing.get(
       req.params.id,

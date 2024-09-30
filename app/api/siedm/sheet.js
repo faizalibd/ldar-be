@@ -1,20 +1,19 @@
 const axios = require("axios").default;
 const { MessageProvider } = require("../../../core");
 
-let uri = "/api/transaction/drawing";
+let uri = "/api/transaction/sheet";
 
-class DrawingApi {
+class SheetApi {
   constructor({ connection }) {
     this.connection = connection;
   }
-  async get(token, id, number, revision, title, program_ref, adcn) {
+  async get(token, id, idDrawing, sheet, number, type) {
     let url = this.connection.host + uri;
     url += id ? `/${id}?` : "?";
+    url += idDrawing ? `&idDrawing=${idDrawing}` : "";
+    url += sheet ? `&sheet=${sheet}` : "";
     url += number ? `&number=${number}` : "";
-    url += revision ? `&revision=${revision}` : "";
-    url += title ? `&title=${title}` : "";
-    url += program_ref ? `&program_ref=${program_ref}` : "";
-    url += adcn ? `&adcn=${adcn}` : "";
+    url += type ? `&type=${type}` : "";
 
     this.connection.config.authorization = token;
 
@@ -29,4 +28,4 @@ class DrawingApi {
   }
 }
 
-module.exports = DrawingApi;
+module.exports = SheetApi;

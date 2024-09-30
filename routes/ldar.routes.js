@@ -11,19 +11,19 @@ router.get("/drawing", controller.ldar.drawing.get);
 router.get("/drawing/:id", controller.ldar.drawing.get);
 router.post(
   "/drawing",
-  //validate(validation.ldar.drawing.add),
+  validate(validation.ldar.drawing.add),
   entry("insert"),
   controller.ldar.drawing.add
 );
 router.put(
   "/drawing",
-  // validate(validation.ldar.drawing.update),
+  validate(validation.ldar.drawing.update),
   entry("update"),
   controller.ldar.drawing.update
 );
 router.delete(
   "/drawing",
-  // validate(validation.ldar.drawing.delete),
+  validate(validation.ldar.drawing.delete),
   controller.ldar.drawing.delete
 );
 
