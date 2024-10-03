@@ -234,7 +234,7 @@ exports.update = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 0"
+              "LDAR with Status 0, 1, 2, or 3"
             )
         );
       }

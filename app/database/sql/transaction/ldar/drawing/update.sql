@@ -1,6 +1,5 @@
 UPDATE DBAPDM.TMLDARDRAW
-SET I_ID_LDAR = :LDARId,
-	I_LDAR_DRAWDISPO = :drawingNo,
+SET I_LDAR_DRAWDISPO = :drawingNo,
 	I_LDAR_ADCNDCN = :adcn,
 	I_LDAR_DRAWSHEET = :drawingSheet,
 	I_UPDATE = :updateUser,

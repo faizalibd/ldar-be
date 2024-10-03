@@ -55,6 +55,9 @@ const classApi = {
     drawing: {
       api: require("./siedm/drawing"),
     },
+    sheet: {
+      api: require("./siedm/sheet"),
+    },
   },
   mta: {
     ata: {
@@ -84,6 +87,9 @@ const api = {
   },
   siedm: {
     drawing: new classApi.siedm.drawing.api({
+      connection: connection.siedm,
+    }),
+    sheet: new classApi.siedm.sheet.api({
       connection: connection.siedm,
     }),
   },
