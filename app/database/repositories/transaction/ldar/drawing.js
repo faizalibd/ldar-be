@@ -5,7 +5,7 @@ class DrawingRepository {
     this.db = db;
   }
 
-  async get(id, LDARId, drawingNo, adcn, drawingSheet, limit, offset) {
+  async get(id, LDARId, drawingNumber, adcn, drawingSheet, limit, offset) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -19,19 +19,22 @@ class DrawingRepository {
       condition += " AND I_ID_LDAR = :LDARId";
       values.LDARId = LDARId;
     }
-    if (drawingNo) {
-      condition += " AND I_LDAR_DRAWDISPO LIKE '%' || :drawingNo|| '%'";
-      values.drawingNo = drawingNo;
+    if (drawingNumber) {
+      condition += " AND I_LDAR_DRAWDISPO = :drawingNumber";
+      values.drawingNumber = drawingNumber;
     }
     if (adcn) {
-      condition += " AND I_LDAR_ADCNDCN LIKE '%' || :adcn || '%'";
+      condition += " AND I_LDAR_ADCNDCN = :adcn";
       values.adcn = adcn;
     }
     if (drawingSheet) {
       condition += " AND I_LDAR_DRAWSHEET = :drawingSheet";
       values.drawingSheet = drawingSheet;
     }
-
+    if (entry) {
+      condition += " AND I_ENTRY = :entry";
+      values.entry = entry;
+    }
     if (limit) {
       rows = " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
       values.offset = offset ? offset : 0;
@@ -47,7 +50,7 @@ class DrawingRepository {
     ).rows;
   }
 
-  async exists(id, LDARId, drawingNo, adcn, drawingSheet, idNot) {
+  async exists(id, LDARId, drawingNumber, adcn, drawingSheet, idNot) {
     let condition = " WHERE 1=1";
     let values = {};
     if (id) {
@@ -58,17 +61,21 @@ class DrawingRepository {
       condition += " AND I_ID_LDAR = :LDARId";
       values.LDARId = LDARId;
     }
-    if (drawingNo) {
-      condition += " AND I_LDAR_DRAWDISPO LIKE '%' || :drawingNo|| '%'";
-      values.drawingNo = drawingNo;
+    if (drawingNumber) {
+      condition += " AND I_LDAR_DRAWDISPO = :drawingNumber";
+      values.drawingNumber = drawingNumber;
     }
     if (adcn) {
-      condition += " AND I_LDAR_ADCNDCN LIKE '%' || :adcn || '%'";
+      condition += " AND I_LDAR_ADCNDCN = :adcn";
       values.adcn = adcn;
     }
     if (drawingSheet) {
       condition += " AND I_LDAR_DRAWSHEET = :drawingSheet";
       values.drawingSheet = drawingSheet;
+    }
+    if (entry) {
+      condition += " AND I_ENTRY = :entry";
+      values.entry = entry;
     }
     if (idNot == 0 || idNot) {
       condition += " AND I_ID_LDARDRAW != :idNot";
@@ -87,7 +94,7 @@ class DrawingRepository {
     return await this.db
       .execute("dbapdm", sql.ldar.drawing.insert, values, { autoCommit: true })
       .then(
-        async () => (await this.get("", values.LDARId, values.drawingNo))[0]
+        async () => (await this.get("", values.LDARId, values.drawingNumber))[0]
       )
       .catch((err) => {
         throw err;

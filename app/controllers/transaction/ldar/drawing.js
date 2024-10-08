@@ -18,6 +18,7 @@ exports.get = async (req, res) => {
       req.query.drawingNo,
       req.query.adcn,
       req.query.drawingSheet,
+      req.query.entry,
       req.query.limit,
       req.query.offset
     );
