@@ -1,6 +1,7 @@
 SELECT I_ID_LDARDRAW "id",
 	I_ID_LDAR "LDARId",
-	I_LDAR_DRAWDISPO "drawingNo",
+	I_LDAR_DRAWDISPO "drawingNumber",
 	I_LDAR_ADCNDCN "adcn",
-	I_LDAR_DRAWSHEET "drawingSheet"
+	I_LDAR_DRAWSHEET "drawingSheet",
+	I_ENTRY "entry"
 FROM DBAPDM.TMLDARDRAW
