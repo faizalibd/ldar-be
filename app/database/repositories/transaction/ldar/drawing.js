@@ -5,7 +5,16 @@ class DrawingRepository {
     this.db = db;
   }
 
-  async get(id, LDARId, drawingNumber, adcn, drawingSheet, limit, offset) {
+  async get(
+    id,
+    LDARId,
+    drawingNumber,
+    adcn,
+    drawingSheet,
+    entry,
+    limit,
+    offset
+  ) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -50,7 +59,7 @@ class DrawingRepository {
     ).rows;
   }
 
-  async exists(id, LDARId, drawingNumber, adcn, drawingSheet, idNot) {
+  async exists(id, LDARId, drawingNumber, adcn, drawingSheet, entry, idNot) {
     let condition = " WHERE 1=1";
     let values = {};
     if (id) {
