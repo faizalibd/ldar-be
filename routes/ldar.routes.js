@@ -11,6 +11,7 @@ router.get("/drawing", controller.ldar.drawing.get);
 router.get("/drawing/:id", controller.ldar.drawing.get);
 router.post(
   "/drawing",
+  parse("drawingSheet"),
   validate(validation.ldar.drawing.add),
   entry("insert"),
   controller.ldar.drawing.add

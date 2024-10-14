@@ -100,14 +100,19 @@ class DrawingRepository {
   }
 
   async add({ body: values }) {
-    return await this.db
-      .execute("dbapdm", sql.ldar.drawing.insert, values, { autoCommit: true })
-      .then(
-        async () => (await this.get("", values.LDARId, values.drawingNumber))[0]
-      )
-      .catch((err) => {
-        throw err;
+    const {drawingSheet, ...rest} = values;
+
+    return await Promise.all(drawingSheet.map(async (sheet) => {
+      return await this.db
+        .execute("dbapdm", sql.ldar.drawing.insert, {sheet, ...rest}, { autoCommit: true })
+        .then(
+          async () => (await this.get("", values.LDARId, values.drawingNumber, "", sheet))[0]
+        )
+        .catch((err) => {
+          throw err;
       });
+    }))
+  
   }
 
   async update({ body: values }) {
