@@ -64,7 +64,16 @@ class DrawingRepository {
     ).rows;
   }
 
-  async exists(id, LDARId, drawingNumber, adcn, drawingSheet, entry, idNot) {
+  async exists(
+    id,
+    LDARId,
+    idDrawingSheet,
+    drawingNumber,
+    adcn,
+    drawingSheet,
+    entry,
+    idNot
+  ) {
     let condition = " WHERE 1=1";
     let values = {};
     if (id) {
@@ -74,6 +83,10 @@ class DrawingRepository {
     if (LDARId) {
       condition += " AND I_ID_LDAR = :LDARId";
       values.LDARId = LDARId;
+    }
+    if (idDrawingSheet) {
+      condition += " AND I_DRAWING_SHEET = :idDrawingSheet";
+      values.idDrawingSheet = idDrawingSheet;
     }
     if (drawingNumber) {
       condition += " AND I_LDAR_DRAWDISPO = :drawingNumber";

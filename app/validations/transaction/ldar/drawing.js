@@ -76,6 +76,20 @@ exports.add = [
 
       return true;
     }),
+  body("idDrawingSheet")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID Drawing Sheet")
+    )
+    .bail()
+    .isLength({ max: 6 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID Drawing Sheet", 6)
+    ),
   body("adcn")
     .notEmpty()
     .withMessage(
@@ -90,7 +104,7 @@ exports.add = [
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN / DCN", 5)
     ),
-  body("drawingNo")
+  body("drawingNumber")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -160,7 +174,7 @@ exports.add = [
     .bail()
     .custom(async (val, { req }) => {
       let found;
-      let drawingNo = req.body.drawingNo;
+      let drawingNumber = req.body.drawingNumber;
 
       found =
         !apiValidation ||
@@ -169,7 +183,7 @@ exports.add = [
           null,
           null,
           val,
-          drawingNo
+          drawingNumber
         ));
       if (!found) {
         throw new Error(
@@ -293,7 +307,7 @@ exports.update = [
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN / DCN", 5)
     ),
-  body("drawingNo")
+  body("drawingNumber")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -371,7 +385,7 @@ exports.update = [
     .bail()
     .custom(async (val, { req }) => {
       let found;
-      let drawingNo = req.body.drawingNo;
+      let drawingNumber = req.body.drawingNumber;
 
       found =
         !apiValidation ||
@@ -380,7 +394,7 @@ exports.update = [
           null,
           null,
           val,
-          drawingNo
+          drawingNumber
         ));
       if (!found) {
         throw new Error(
