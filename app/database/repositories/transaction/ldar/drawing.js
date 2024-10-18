@@ -8,6 +8,7 @@ class DrawingRepository {
   async get(
     id,
     LDARId,
+    idDrawingSheet,
     drawingNumber,
     adcn,
     drawingSheet,
@@ -27,6 +28,10 @@ class DrawingRepository {
     if (LDARId) {
       condition += " AND I_ID_LDAR = :LDARId";
       values.LDARId = LDARId;
+    }
+    if (idDrawingSheet) {
+      condition += " AND I_DRAWING_SHEET = :idDrawingSheet";
+      values.idDrawingSheet = idDrawingSheet;
     }
     if (drawingNumber) {
       condition += " AND I_LDAR_DRAWDISPO = :drawingNumber";

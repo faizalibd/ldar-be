@@ -15,6 +15,7 @@ exports.get = async (req, res) => {
     const result = await db.transaction.ldar.drawing.get(
       req.params.id,
       req.query.LDARId,
+      req.query.idDrawingSheet,
       req.query.drawingNumber,
       req.query.adcn,
       req.query.drawingSheet,
