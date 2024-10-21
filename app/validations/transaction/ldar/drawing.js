@@ -89,107 +89,32 @@ exports.add = [
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID Drawing Sheet", 6)
-    ),
-  body("adcn")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ADCN / DCN")
     )
-    .bail()
-    .isLength({ max: 5 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN / DCN", 5)
-    ),
-  body("drawingNumber")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Number")
-    )
-    .bail()
-    .isLength({ max: 40 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Number", 40)
-    )
-    .bail()
     .custom(async (val, { req }) => {
       let found;
-      let adcn = req.body.adcn;
 
       found =
         !apiValidation ||
-        (await api.siedm.drawing.get(
-          req.headers.authorization,
-          null,
-          val,
-          null,
-          null,
-          null,
-          adcn
-        ));
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Number")
-        );
-      }
-
-      found =
-        (await db.transaction.ldar.drawing.exists("", req.body.LDARId, val)) ==
-        1;
-      if (found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.ALREADY_EXIST,
-              "Drawing Number with this LDAR"
-            )
-        );
-      }
-      return true;
-    }),
-  body("drawingSheet")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Sheet")
-    )
-    .bail()
-    .isLength({ max: 3 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Sheet", 3)
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found;
-      let drawingNumber = req.body.drawingNumber;
-
-      found =
-        !apiValidation ||
-        (await api.siedm.sheet.get(
-          req.headers.authorization,
-          null,
-          null,
-          val,
-          drawingNumber
-        ));
+        (await api.siedm.sheet.get(req.headers.authorization, val));
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
             MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Sheet")
+        );
+      }
+
+      found = await db.transaction.ldar.drawing.exists(
+        "",
+        req.body.LDARId,
+        val
+      );
+
+      if (found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "Drawing")
         );
       }
       return true;

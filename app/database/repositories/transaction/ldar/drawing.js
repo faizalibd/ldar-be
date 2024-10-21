@@ -1,5 +1,6 @@
 const { transaction: sql } = require("../../../sql");
 const { api } = require("../../../../api");
+const { log } = require("../../../../../core/logger/orm_logger");
 
 class DrawingRepository {
   constructor(db) {
@@ -118,16 +119,27 @@ class DrawingRepository {
     ).rows[0].ct;
   }
 
-  async add({ headers,  body: values }) {
+  async add({ headers, body: values }) {
     let sheet = await api.siedm.sheet.get(
-          headers.authorization,
-          values.idDrawingSheet
-        );
-    values.xx = sheet.xx;
+      headers.authorization,
+      values.idDrawingSheet
+    );
+    let drawing = await api.siedm.drawing.get(
+      headers.authorization,
+      sheet.idDrawing
+    );
+
+    values.drawingNumber = sheet.drawingNumber;
+    values.drawingSheet = sheet.drawingSheet;
+    values.adcn = drawing.adcn;
+
     return await this.db
       .execute("dbapdm", sql.ldar.drawing.insert, values, { autoCommit: true })
       .then(
-        async () => (await this.get("", values.LDARId, values.drawingNumber))[0]
+        async () =>
+          (
+            await this.get("", values.LDARId, values.idDrawingSheet)
+          )[0]
       )
       .catch((err) => {
         throw err;
