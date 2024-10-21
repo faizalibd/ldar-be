@@ -1,4 +1,5 @@
 const { transaction: sql } = require("../../../sql");
+const { api } = require("../../../../api");
 
 class DrawingRepository {
   constructor(db) {
@@ -117,7 +118,12 @@ class DrawingRepository {
     ).rows[0].ct;
   }
 
-  async add({ body: values }) {
+  async add({ headers,  body: values }) {
+    let sheet = await api.siedm.sheet.get(
+          headers.authorization,
+          values.idDrawingSheet
+        );
+    values.xx = sheet.xx;
     return await this.db
       .execute("dbapdm", sql.ldar.drawing.insert, values, { autoCommit: true })
       .then(
