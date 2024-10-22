@@ -322,19 +322,6 @@ exports.update = [
     .custom(async (val, { req }) => {
       let found;
 
-      found = val == 0 || val == "0";
-
-      if (found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.UNPROCESSABLE_ENTITY,
-              "Approval Type"
-            )
-        );
-      }
-
       found = (await db.reference.approval_type.exists(val)) == 1;
       if (!found) {
         throw new Error(
