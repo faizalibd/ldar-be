@@ -815,12 +815,6 @@ exports.update_pe = [
       return true;
     }),
   body("acceptedReason")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Accepted Reason")
-    )
     .bail()
     .isLength({ max: 50 })
     .withMessage(
