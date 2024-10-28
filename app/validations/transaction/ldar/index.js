@@ -829,12 +829,6 @@ exports.update_pe = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Accepted Reason", 50)
     ),
   body("planningReview")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Planning Review")
-    )
     .bail()
     .isLength({ max: 300 })
     .withMessage(
