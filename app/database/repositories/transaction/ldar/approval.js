@@ -8,6 +8,7 @@ const {
 } = require("../../../../functions/common");
 const { join } = require("path");
 const { email } = require("../../../../functions");
+const { log } = require("console");
 
 const dir = create_dir("Approval");
 
@@ -158,14 +159,14 @@ class ApprovalRepository {
       values.fileName = "";
     }
 
-    values.fileName = file ? file.originalname : "";
-
     return await this.db
       .execute("dbapdm", sql.ldar.approval.update, values, { autoCommit: true })
       .then(async () => {
         switch (flag) {
           case 1:
-            delete_file(join(dir, values.id), ldar.fileName, true);
+            if (ldar.fileName) {
+              delete_file(join(dir, values.id), ldar.fileName, true);
+            }
             create_file(join(dir, values.id), file);
             break;
           case 3:
