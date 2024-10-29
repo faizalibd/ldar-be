@@ -118,7 +118,7 @@ class ApprovalRepository {
     let cc;
     let subject = "Email to DE (Assigned DE)";
     let text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
-    
+
     if (process.env.EMAIL == "FALSE") {
       text += `<br/><br/> REAL TO EMAIL: ${to}`;
       to = process.env.EMAIL_DUMMY;
@@ -143,13 +143,34 @@ class ApprovalRepository {
   }
 
   async update_func(values, file) {
+    const ldar = (await this.get(values.id))[0];
+    let flag = 0;
+    if (file) {
+      // File di replace
+      flag = 1;
+      values.fileName = file.originalname;
+    } else if (values.fileName) {
+      // File tetap
+      flag = 2;
+    } else {
+      // File di hapus
+      flag = 3;
+      values.fileName = "";
+    }
+
     values.fileName = file ? file.originalname : "";
 
     return await this.db
       .execute("dbapdm", sql.ldar.approval.update, values, { autoCommit: true })
       .then(async () => {
-        if (file) {
-          create_file(join(dir, values.id), file);
+        switch (flag) {
+          case 1:
+            delete_file(join(dir, values.id), ldar.fileName, true);
+            create_file(join(dir, values.id), file);
+            break;
+          case 3:
+            delete_file(join(dir, values.id), ldar.fileName, true);
+            break;
         }
       })
       .then(async () => (await this.get(values.id))[0])

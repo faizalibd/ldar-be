@@ -815,7 +815,6 @@ exports.update_pe = [
       return true;
     }),
   body("acceptedReason")
-    .bail()
     .isLength({ max: 50 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
@@ -823,7 +822,6 @@ exports.update_pe = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Accepted Reason", 50)
     ),
   body("planningReview")
-    .bail()
     .isLength({ max: 300 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
