@@ -8,7 +8,6 @@ const {
 } = require("../../../../functions/common");
 const { join } = require("path");
 const { email } = require("../../../../functions");
-const { log } = require("console");
 
 const dir = create_dir("Approval");
 
@@ -145,6 +144,7 @@ class ApprovalRepository {
 
   async update_func(values, file) {
     const ldar = (await this.get(values.id))[0];
+    values.fileName = values.fileName ?? "";
     let flag = 0;
     if (file) {
       // File di replace
@@ -156,7 +156,6 @@ class ApprovalRepository {
     } else if (ldar.fileName) {
       // File di hapus
       flag = 3;
-      values.fileName = "-";
     }
 
     return await this.db
