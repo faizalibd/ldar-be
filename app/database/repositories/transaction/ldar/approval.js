@@ -153,7 +153,7 @@ class ApprovalRepository {
     } else if (values.fileName) {
       // File tetap
       flag = 2;
-    } else {
+    } else if (ldar.fileName) {
       // File di hapus
       flag = 3;
       values.fileName = "";
