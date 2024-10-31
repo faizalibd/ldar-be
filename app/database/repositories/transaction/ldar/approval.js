@@ -156,7 +156,7 @@ class ApprovalRepository {
     } else if (ldar.fileName) {
       // File di hapus
       flag = 3;
-      values.fileName = "";
+      values.fileName = "-";
     }
 
     return await this.db
