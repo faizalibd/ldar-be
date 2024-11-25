@@ -18,7 +18,7 @@ exports.get = async (req, res) => {
     const result = await db.transaction.ldar.get(
       req.params.id,
       req.query.number,
-      req.query.modelCode,
+      req.query.modelId,
       req.query.nik,
       req.query.submittedNik,
       req.query.submittedDate,
