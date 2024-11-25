@@ -57,7 +57,7 @@ class LDARRepository {
       values.number = number;
     }
     if (modelCode) {
-      condition += " AND C_PGM_MODEL = :modelCode";
+      condition += " AND I_ID_PGMMODEL = :modelCode";
       values.modelCode = modelCode;
     }
     if (nik) {
@@ -212,7 +212,7 @@ class LDARRepository {
       values.number = number;
     }
     if (modelCode) {
-      condition += " AND C_PGM_MODEL = :modelCode";
+      condition += " AND I_ID_PGMMODEL = :modelCode";
       values.modelCode = modelCode;
     }
     if (nik) {
