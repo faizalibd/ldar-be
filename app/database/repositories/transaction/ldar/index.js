@@ -14,7 +14,7 @@ class LDARRepository {
   async get(
     id,
     number,
-    modelCode,
+    modelId,
     nik,
     submittedNik,
     submittedDate,
@@ -56,9 +56,9 @@ class LDARRepository {
       condition += " AND I_LDAR LIKE '%' || :number || '%'";
       values.number = number;
     }
-    if (modelCode) {
-      condition += " AND I_ID_PGMMODEL = :modelCode";
-      values.modelCode = modelCode;
+    if (modelId) {
+      condition += " AND I_ID_PGMMODEL = :modelId";
+      values.modelId = modelId;
     }
     if (nik) {
       condition +=
@@ -183,7 +183,7 @@ class LDARRepository {
   async exists(
     id,
     number,
-    modelCode,
+    modelId,
     nik,
     submittedNik,
     submittedDate,
@@ -211,9 +211,9 @@ class LDARRepository {
       condition += " AND I_LDAR = :number";
       values.number = number;
     }
-    if (modelCode) {
-      condition += " AND I_ID_PGMMODEL = :modelCode";
-      values.modelCode = modelCode;
+    if (modelId) {
+      condition += " AND I_ID_PGMMODEL = :modelId";
+      values.modelId = modelId;
     }
     if (nik) {
       condition +=

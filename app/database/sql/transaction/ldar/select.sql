@@ -1,6 +1,6 @@
 SELECT DISTINCT A.I_ID_LDAR "id",
 	I_LDAR "number",
-	I_ID_PGMMODEL "modelCode",
+	I_ID_PGMMODEL "modelId",
 	A.I_ENTRY "submittedNik",
 	N_LDAR_SUBMITBY "submittedBy",
 	TO_CHAR(A.D_ENTRY, 'YYYY-MM-DD') "submittedDate",
