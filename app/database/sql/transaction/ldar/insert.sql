@@ -1,6 +1,6 @@
 INSERT INTO DBAPDM.TMLDAR (
         I_LDAR,
-        C_PGM_MODEL,
+        I_ID_PGMMODEL,
         N_LDAR_SUBMITBY,
         I_LDAR_PHONE,
         C_LDAR_LSNUNIT,
@@ -29,7 +29,7 @@ VALUES (
             FROM DBAPDM.TMLDAR
             WHERE TO_CHAR(D_ENTRY, 'YYMM') = TO_CHAR(CURRENT_DATE, 'YYMM')
         ),
-        :modelCode,
+        :modelId,
         :submittedBy,
         :phone,
         :LSNUnit,

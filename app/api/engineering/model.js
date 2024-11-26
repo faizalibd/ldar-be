@@ -7,11 +7,10 @@ class ModelApi {
   constructor({ connection }) {
     this.connection = connection;
   }
-  async get(token, kode) {
+  async get(token, id) {
     let url = this.connection.host + uri;
-    url += kode ? `/${kode}` : "";
+    url += id ? `/${id}` : "";
     this.connection.config.headers.authorization = token;
-
     return await axios
       .get(url, this.connection.config)
       .then(({ data }) => {

@@ -1,6 +1,7 @@
 const { api } = require("../../../../api");
 const { transaction: sql } = require("../../../sql");
 const { email } = require("../../../../functions");
+const { header } = require("express-validator");
 
 class LDARRepository {
   constructor(db, userRole, approval, file, drawing) {
@@ -33,7 +34,8 @@ class LDARRepository {
     typeCode,
     nikApproval,
     limit,
-    offset
+    offset,
+    token
   ) {
     let additionalSelect = "";
     let from = ` FROM DBAPDM.TMLDAR A LEFT JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR 
@@ -161,13 +163,29 @@ class LDARRepository {
       values.offset = offset ? offset : 0;
       values.limit = limit;
     }
-    let result = (
-      await this.db.execute(
-        "dbapdm",
-        sql.ldar.select + additionalSelect + from + condition + orderby + rows,
-        values
-      )
-    ).rows;
+    let result = await Promise.all(
+      (
+        await this.db.execute(
+          "dbapdm",
+          sql.ldar.select +
+            additionalSelect +
+            from +
+            condition +
+            orderby +
+            rows,
+          values
+        )
+      ).rows.map(async (d) => {
+        if (d.modelId) {
+          let model = await api.engineering.model.get(token, d.modelId);
+          d.modelCode = model.kode;
+          d.modelName = model.nama;
+          d.programCode = model.kode_program;
+          d.programName = model.nama_program;
+        }
+        return d;
+      })
+    );
 
     if (id) {
       return await Promise.all(
@@ -301,7 +319,7 @@ class LDARRepository {
     ).rows[0].ct;
   }
 
-  async add({ body: values }) {
+  async add({ body: values, headers }) {
     let submittedBy = await api.info.employee.get(values.insertUser);
     values.submittedBy = submittedBy[0].nama;
     values.LSNUnit = submittedBy[0].organisasi;
@@ -320,7 +338,20 @@ class LDARRepository {
               "",
               "",
               values.refCode,
-              values.refNumber
+              values.refNumber,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              headers.authorization
             )
           )[0]
       )
@@ -329,10 +360,16 @@ class LDARRepository {
       });
   }
 
-  async update({ url, body: { nik, remark, AWOPNik, ...values }, file }) {
+  async update({
+    url,
+    body: { nik, remark, AWOPNik, ...values },
+    file,
+    headers,
+  }) {
     let data;
     let query;
     let employee;
+
     switch (url) {
       case "/":
         // employee = await api.info.employee.get(values.updateUser);
@@ -359,7 +396,7 @@ class LDARRepository {
         query = sql.ldar.update_pe_manhour;
         break;
       case "/status":
-        let result = await this.updateStatus(values);
+        let result = await this.updateStatus(values, headers.authorization);
         let code;
         let to;
 
@@ -494,16 +531,74 @@ class LDARRepository {
     }
     return await this.db
       .execute("dbapdm", query, values, { autoCommit: true })
-      .then(async () => (await this.get(values.id))[0])
+      .then(
+        async () =>
+          (
+            await this.get(
+              values.id,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              headers.authorization
+            )
+          )[0]
+      )
       .catch((err) => {
         throw err;
       });
   }
 
-  async updateStatus(values) {
+  async updateStatus(values, headers) {
     return await this.db
       .execute("dbapdm", sql.ldar.update_status, values, { autoCommit: true })
-      .then(async () => (await this.get(values.id))[0])
+      .then(
+        async () =>
+          (
+            await this.get(
+              values.id,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              headers.authorization
+            )
+          )[0]
+      )
       .catch((err) => {
         throw err;
       });
@@ -511,7 +606,7 @@ class LDARRepository {
 
   async delete({ body: { id } }) {
     await this.db
-      .execute("dbapdm", sql.ldar.delete, { id: id }, { autoCommit: true })
+      .execute("dbapdm", sql.ldar.delete, { id }, { autoCommit: true })
       .catch((err) => {
         throw err;
       });

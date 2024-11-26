@@ -37,7 +37,8 @@ exports.get = async (req, res) => {
       req.query.typeCode,
       req.query.nikApproval,
       req.query.limit,
-      req.query.offset
+      req.query.offset,
+      req.headers.authorization
     );
     if (!result.length) {
       response.code = MessageProvider.status(Messages.KEYS.NOT_FOUND);

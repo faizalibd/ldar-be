@@ -11,19 +11,12 @@ exports.file = require("./file");
 exports.drawing = require("./drawing");
 
 exports.add = [
-  body("modelCode")
+  body("modelId")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
         MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Model")
-    )
-    .bail()
-    .isLength({ max: 8 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Model", 8)
     )
     .bail()
     .custom(async (val, { req }) => {
@@ -241,19 +234,12 @@ exports.update = [
 
       return true;
     }),
-  body("modelCode")
+  body("modelId")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
         MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Model")
-    )
-    .bail()
-    .isLength({ max: 8 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Model", 8)
     )
     .bail()
     .custom(async (val, { req }) => {
@@ -527,13 +513,39 @@ exports.update_edm = [
     .custom(async (val, { req }) => {
       let found;
       if (apiValidation) {
-        let data = (await db.transaction.ldar.get(req.body.id))[0];
+        let data = (
+          await db.transaction.ldar.get(
+            req.body.id,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            req.headers.authorization
+          )
+        )[0];
         let program = (
           await api.engineering.model.get(
             req.headers.authorization,
-            data.modelCode
+            data.modelId
           )
-        ).kode_program;
+        ).id;
 
         found = await api.mta.ata.get(
           req.headers.authorization,
@@ -577,7 +589,33 @@ exports.update_edm = [
         );
       }
 
-      let EDM = (await db.transaction.ldar.get(req.body.id))[0].EDMNik;
+      let EDM = (
+        await db.transaction.ldar.get(
+          req.body.id,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          req.headers.authorization
+        )
+      )[0].EDMNik;
 
       found = !EDM || EDM == val;
 
@@ -1082,7 +1120,33 @@ exports.update_status = [
         );
       }
 
-      let data = (await db.transaction.ldar.get(val))[0];
+      let data = (
+        await db.transaction.ldar.get(
+          val,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          req.headers.authorization
+        )
+      )[0];
 
       found =
         !["5", "6"].includes(req.body.status) ||

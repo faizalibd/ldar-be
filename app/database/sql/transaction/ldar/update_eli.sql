@@ -1,5 +1,5 @@
 UPDATE DBAPDM.TMLDAR
-SET C_PGM_MODEL = :modelCode,
+SET I_ID_PGMMODEL = :modelId,
 	I_LDAR_PHONE = :phone,
 	-- N_LDAR_SUBMITBY = :submittedBy
 	-- C_LDAR_LSNUNIT = :LSNUnit,
