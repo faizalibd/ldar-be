@@ -508,62 +508,7 @@ exports.update_edm = [
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Group/Ata", 40)
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found;
-      if (apiValidation) {
-        let data = (
-          await db.transaction.ldar.get(
-            req.body.id,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            req.headers.authorization
-          )
-        )[0];
-        let program = (
-          await api.engineering.model.get(
-            req.headers.authorization,
-            data.modelId
-          )
-        ).id;
-
-        found = await api.mta.ata.get(
-          req.headers.authorization,
-          "",
-          program,
-          val
-        );
-        if (!found) {
-          throw new Error(
-            MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-              "|" +
-              MessageProvider.message(Messages.KEYS.NOT_FOUND, "Group/Ata")
-          );
-        }
-      }
-
-      return true;
-    }),
+    ),
   body("entry")
     .notEmpty()
     .withMessage(
