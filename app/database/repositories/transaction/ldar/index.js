@@ -178,7 +178,6 @@ class LDARRepository {
       ).rows.map(async (d) => {
         if (d.modelId) {
           let model = await api.engineering.model.get(token, d.modelId);
-          console.log(d, model);
           d.modelCode = model.kode;
           d.modelName = model.nama;
           d.programCode = model.kode_program;
