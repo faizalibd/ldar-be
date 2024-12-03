@@ -178,6 +178,7 @@ class LDARRepository {
       ).rows.map(async (d) => {
         if (d.modelId) {
           let model = await api.engineering.model.get(token, d.modelId);
+          console.log(d, model);
           d.modelCode = model.kode;
           d.modelName = model.nama;
           d.programCode = model.kode_program;
@@ -566,7 +567,7 @@ class LDARRepository {
       });
   }
 
-  async updateStatus(values, headers) {
+  async updateStatus(values, token) {
     return await this.db
       .execute("dbapdm", sql.ldar.update_status, values, { autoCommit: true })
       .then(
@@ -595,7 +596,7 @@ class LDARRepository {
               "",
               "",
               "",
-              headers.authorization
+              token
             )
           )[0]
       )
