@@ -76,23 +76,26 @@ exports.add = [
 
       return true;
     }),
-  body("idDrawingSheet")
-    .notEmpty()
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID Drawing Sheet")
-    )
-    .bail()
-    .isLength({ max: 6 })
-    .withMessage(
-      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-        "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID Drawing Sheet", 6)
-    )
-    .custom(async (val, { req }) => {
-      let found;
+  body("idDrawingSheet").custom(async (val, { req }) => {
+    let found;
 
+    if (!req.body.drawingNumber && !val) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+          "|" +
+          MessageProvider.message(
+            Messages.KEYS.NOT_EMPTY,
+            "Drawing Sheet & Drawing Number"
+          )
+      );
+    } else if (val && req.body.drawingNumber) {
+      throw new Error(
+        MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
+          "|Do not enter the Drawing Sheet id and Drawing Number together "
+      );
+    }
+
+    if (val) {
       found =
         !apiValidation ||
         (await api.siedm.sheet.get(req.headers.authorization, val));
@@ -109,7 +112,6 @@ exports.add = [
         req.body.LDARId,
         val
       );
-
       if (found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
@@ -117,8 +119,83 @@ exports.add = [
             MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "Drawing")
         );
       }
-      return true;
-    }),
+    }
+    return true;
+  }),
+  body("drawingNumber").custom(async (val, { req }) => {
+    let found;
+    if (val) {
+      if (val.length > 50) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+            "|" +
+            MessageProvider.message(
+              Messages.KEYS.MAX_LENGTH,
+              "Drawing Number",
+              50
+            )
+        );
+      }
+    }
+
+    return true;
+  }),
+  body("adcn").custom(async (val, { req }) => {
+    let found;
+
+    if (req.body.drawingNumber) {
+      if (!val) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ADCN/DCN")
+        );
+      }
+
+      if (val.length > 5) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN/DCN", 5)
+        );
+      }
+
+      found =
+        !apiValidation ||
+        (await api.siedm.drawing.get(
+          req.headers.authorization,
+          "",
+          req.body.drawingNumber,
+          "",
+          "",
+          "",
+          val
+        ));
+      if (!found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Number")
+        );
+      }
+
+      found = await db.transaction.ldar.drawing.exists(
+        "",
+        req.body.LDARId,
+        null,
+        req.body.drawingNumber,
+        val
+      );
+      if (found) {
+        throw new Error(
+          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+            "|" +
+            MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "Drawing")
+        );
+      }
+    }
+    return true;
+  }),
   body("entry")
     .notEmpty()
     .withMessage(
