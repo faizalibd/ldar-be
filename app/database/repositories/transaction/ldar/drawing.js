@@ -1,6 +1,5 @@
 const { transaction: sql } = require("../../../sql");
 const { api } = require("../../../../api");
-const { log } = require("../../../../../core/logger/orm_logger");
 
 class DrawingRepository {
   constructor(db) {
@@ -120,27 +119,33 @@ class DrawingRepository {
   }
 
   async add({ headers, body: values }) {
-    let sheet = await api.siedm.sheet.get(
-      headers.authorization,
-      values.idDrawingSheet
-    );
-    let drawing = await api.siedm.drawing.get(
-      headers.authorization,
-      sheet.idDrawing
-    );
+    if (values.idDrawingSheet) {
+      let sheet = await api.siedm.sheet.get(
+        headers.authorization,
+        values.idDrawingSheet
+      );
+      let drawing = await api.siedm.drawing.get(
+        headers.authorization,
+        sheet.idDrawing
+      );
 
-    values.drawingNumber = sheet.drawingNumber;
-    values.drawingSheet = sheet.drawingSheet;
-    values.adcn = drawing.adcn;
+      values.drawingNumber = sheet.drawingNumber;
+      values.drawingSheet = sheet.drawingSheet;
+      values.adcn = drawing.adcn;
+    } else {
+      values.idDrawingSheet = null;
+      values.drawingSheet = null;
+    }
 
     return await this.db
       .execute("dbapdm", sql.ldar.drawing.insert, values, { autoCommit: true })
-      .then(
-        async () =>
-          (
-            await this.get("", values.LDARId, values.idDrawingSheet)
-          )[0]
-      )
+      .then(async () => {
+        return (
+          await this.get("", values.LDARId, values.idDrawingSheet)
+        ).filter((res) => {
+          return res.idDrawingSheet == values.idDrawingSheet;
+        });
+      })
       .catch((err) => {
         throw err;
       });
