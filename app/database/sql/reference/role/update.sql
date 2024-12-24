@@ -1,0 +1,9 @@
+UPDATE
+	DBAPDM.TRLDARROLE
+SET
+	N_ROLE = :name,
+	E_ROLE = :description,
+	I_UPDATE = :updateUser,
+	D_UPDATE = CURRENT_DATE
+WHERE
+	I_ID_LDARROLE = :id

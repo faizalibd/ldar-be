@@ -1,0 +1,16 @@
+INSERT
+	INTO
+	DBAPDM.TRLDARAPRVTYPE
+(
+    I_ID_LDARAPRVTYPE,
+	E_LDAR_APRVTYPE,
+	I_ENTRY,
+	D_ENTRY
+)
+VALUES
+(
+    :code,
+    :description,
+    :insertUser,
+    CURRENT_DATE
+ )
