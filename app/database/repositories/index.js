@@ -11,5 +11,6 @@ module.exports = {
     approval: require("./transaction/ldar/approval"),
     file: require("./transaction/ldar/file"),
     drawing: require("./transaction/ldar/drawing"),
+    sap: require("./transaction/sap"),
   },
 };
