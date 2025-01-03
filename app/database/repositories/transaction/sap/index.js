@@ -12,7 +12,7 @@ class SAPRepository {
     for (let i = offset; i < +limit + +offset; i++) {
       result.push(array[i]);
     }
-    console.log(result);
+    // console.log(result);
 
     return result;
   }
