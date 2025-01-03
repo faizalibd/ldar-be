@@ -87,6 +87,7 @@ const db = {
       ldar_file,
       ldar_drawing
     ),
+    sap: new transaction.sap(),
   },
 };
 

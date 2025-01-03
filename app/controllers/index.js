@@ -8,5 +8,6 @@ module.exports = {
   },
   transaction: {
     ldar: require("./transaction/ldar"),
+    sap: require("./transaction/sap"),
   },
 };
