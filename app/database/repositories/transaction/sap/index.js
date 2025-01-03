@@ -7,6 +7,7 @@ class SAPRepository {
     let typeUpperCase = type.toUpperCase();
     let array = await api.sap.referensi.get(number, typeUpperCase);
     limit = limit ? limit : array ? array.length : 0;
+    offset = offset ? offset : 0;
 
     let result = [];
     for (let i = offset; i < +limit + +offset; i++) {
