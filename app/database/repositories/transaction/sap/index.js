@@ -6,7 +6,14 @@ class SAPRepository {
   async get(limit = null, offset = 0, type, number) {
     let typeUpperCase = type.toUpperCase();
     let array = await api.sap.referensi.get(number, typeUpperCase);
-    limit = limit ? limit : array ? array.length : 0;
+    // limit = limit ? limit : array ? array.length : 0;
+
+    if (limit) {
+      limit = array.length < limit ? array.length : limit;
+    } else {
+      limit = array ? array.length : 0;
+    }
+
     offset = offset ? offset : 0;
 
     let result = [];
