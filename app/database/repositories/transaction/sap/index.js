@@ -43,7 +43,9 @@ class SAPRepository {
 
     let result = [];
     for (let i = offset; i < +limit + +offset; i++) {
-      result.push(array[i]);
+      if (array[i] != null) {
+        result.push(array[i]);
+      }
     }
     // console.log(result);
 
