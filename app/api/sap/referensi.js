@@ -12,12 +12,15 @@ class ReferensiApi {
     url += number ? `&number=${number}` : "";
     switch (type) {
       case "1":
+      case "RT":
         url += "&type=RT";
         break;
       case "2":
+      case "SOM":
         url += "&type=SOM";
         break;
       case "3":
+      case "ELR":
         url += "&type=ELR";
         break;
     }
