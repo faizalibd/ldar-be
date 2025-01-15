@@ -17,7 +17,8 @@ exports.get = async (req, res) => {
       req.query.role,
       req.query.new_user,
       req.query.limit,
-      req.query.offset
+      req.query.offset,
+      req.query.role2
     );
     if (!result.length) {
       response.code = MessageProvider.status(Messages.KEYS.NOT_FOUND);

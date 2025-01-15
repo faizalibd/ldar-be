@@ -7,7 +7,7 @@ class UserRoleRepository {
     this.roleMenuRepo = roleMenuRepo;
   }
 
-  async get(nik, roleId, role, new_user, limit, offset) {
+  async get(nik, roleId, role, new_user, limit, offset, role2) {
     let condition = " WHERE 1=1";
     let orderby = " ORDER BY 1";
     let values = {};
@@ -24,12 +24,13 @@ class UserRoleRepository {
         values.roleId = roleId;
       }
       if (role) {
-        // condition += " AND B.N_ROLE = :role";
-        // values.role = role;
-
+        condition += " AND B.N_ROLE = :role";
+        values.role = role;
+      }
+      if (role2) {
         condition +=
-          " AND B.I_ID_LDARROLE IN (" +
-          role
+          " AND B.N_ROLE IN (" +
+          role2
             .split(",")
             .map((d) => {
               return "'" + d + "'";
@@ -43,6 +44,7 @@ class UserRoleRepository {
         values.limit = limit;
       }
     }
+    // console.log(condition);
 
     let result = (
       await this.db.execute(
