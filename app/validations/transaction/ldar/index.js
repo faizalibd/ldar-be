@@ -966,7 +966,7 @@ exports.update_status = [
       switch (req.body.status) {
         case "1":
           allowed = "0";
-          user = "EDM";
+          user = "AWOP";
           break;
         case "2":
           allowed = "1";
