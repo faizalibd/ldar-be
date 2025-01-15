@@ -24,8 +24,18 @@ class UserRoleRepository {
         values.roleId = roleId;
       }
       if (role) {
-        condition += " AND B.N_ROLE = :role";
-        values.role = role;
+        // condition += " AND B.N_ROLE = :role";
+        // values.role = role;
+
+        condition +=
+          " AND B.I_ID_LDARROLE IN (" +
+          role
+            .split(",")
+            .map((d) => {
+              return "'" + d + "'";
+            })
+            .join(",") +
+          ")";
       }
       if (limit) {
         rows = " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
