@@ -567,7 +567,7 @@ exports.update_edm = [
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-            "|Already accepted by other EDM"
+            "|Already accepted by other AWO Panel 0"
         );
       }
       return true;
@@ -966,7 +966,7 @@ exports.update_status = [
       switch (req.body.status) {
         case "1":
           allowed = "0";
-          user = "EDM";
+          user = "AWOP";
           break;
         case "2":
           allowed = "1";
@@ -1034,25 +1034,7 @@ exports.update_status = [
       // AWOP ref 1 = false
       // AWOP ref 0 = true
       // EDM ref X = false
-      found =
-        !user ||
-        !(
-          user != "AWOP" ||
-          (user == "AWOP" &&
-            (await db.transaction.ldar.exists(
-              val,
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "3"
-              // "1,2,9"
-            )) == 1)
-        ) ||
-        (await db.reference.user_role.exists("", "", user)) >= 1;
+      found = !user || (await db.reference.user_role.exists("", "", user)) >= 1;
 
       if (!found) {
         throw new Error(
@@ -1141,7 +1123,7 @@ exports.update_status = [
         MessageProvider.message(
           Messages.KEYS.IN,
           "Status",
-          "0 = Created; 1 = Submit to EDM; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed; 10 = Closed "
+          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed; 10 = Closed "
         )
     ),
   body("nik").custom(async (val, { req }) => {
@@ -1288,31 +1270,7 @@ exports.update_status = [
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found;
-      found =
-        !["7", "8"].includes(req.body.status) ||
-        ((await api.info.employee.get(val)) &&
-          (await db.reference.user_role.exists(val, "", "AWOP")) == 1 &&
-          (await db.transaction.ldar.approval.exists(
-            "",
-            req.body.id,
-            "",
-            val
-          )) == 1);
-
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
-        );
-      }
-
-      return true;
-    }),
+    ),
 ];
 
 exports.delete = [

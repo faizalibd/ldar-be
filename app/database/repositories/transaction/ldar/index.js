@@ -406,7 +406,7 @@ class LDARRepository {
             to = (
               await Promise.all(
                 (
-                  await this.userRole.get("", "", "EDM")
+                  await this.userRole.get("", "", "AWOP")
                 )[0].user.map(async (u) => {
                   return u.email;
                 })
@@ -633,11 +633,11 @@ class LDARRepository {
         text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
         break;
       case 4:
-        subject = "Email to AWO Panel (Approve PE)";
+        subject = "Email to AWO Panel 0 (Approve PE)";
         text = `Problem on LDAR No. ${number} has been evaluated, please completed LDAR No. ${number} with justification.`;
         break;
       case 5:
-        subject = "Email to EDM (Reject PE)";
+        subject = "Email to AWO Panel 0 (Reject PE)";
         text = `Problem on LDAR No. ${number} has been completely checked, please release & distribution LDAR No. ${number}.`;
         break;
       case 6:
