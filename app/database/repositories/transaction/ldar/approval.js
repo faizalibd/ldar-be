@@ -147,7 +147,7 @@ class ApprovalRepository {
     values.fileName = values.fileName ?? "";
     let flag = 0;
     if (file) {
-      // File di replace
+      // File di replace atau create file baru
       flag = 1;
       values.fileName = file.originalname;
     } else if (values.fileName) {
@@ -164,12 +164,12 @@ class ApprovalRepository {
         switch (flag) {
           case 1:
             if (ldar.fileName) {
-              delete_file(join(dir, values.id), ldar.fileName, true);
+              delete_file(join(dir, values.id + ""), ldar.fileName, true);
             }
-            create_file(join(dir, values.id), file);
+            create_file(join(dir, values.id + ""), file);
             break;
           case 3:
-            delete_file(join(dir, values.id), ldar.fileName, true);
+            delete_file(join(dir, values.id + ""), ldar.fileName, true);
             break;
         }
       })
