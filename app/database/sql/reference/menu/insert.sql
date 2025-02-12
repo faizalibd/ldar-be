@@ -1,0 +1,24 @@
+INSERT
+	INTO
+	DBAPDM.TRLDARMENU
+(
+	N_LDAR_MENU,
+	I_ID_PARENT,
+	N_LDAR_URLMENU,
+	C_LDAR_SORTMENU,
+	N_LDAR_ICONMENU,
+	C_LDAR_ACTMENU,
+	I_ENTRY,
+	D_ENTRY
+)
+VALUES
+(
+	:name,
+	:parentId,
+	:url,
+	:code,
+	:icon,
+	'1',
+	:insertUser,
+	CURRENT_DATE
+)

@@ -1,0 +1,56 @@
+stages:
+  - init
+  - staging
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+init:
+  stage: init
+  script:
+    - npm install
+  only:
+    - development
+    - test
+    - /-RELEASE$/
+
+deploy_dev:
+    stage: deploy
+    script:
+      - tar --exclude='./.git' --exclude='*.yml' --exclude='.gitignore' -zcvf ~/temp/ldar-be/DEV/ldar-be.tgz .
+      - tar -xzvf ~/temp/ldar-be/DEV/ldar-be.tgz -C ~/temp/ldar-be/DEV
+      - rm -rf ~/temp/ldar-be/DEV/ldar-be.tgz
+      - scp -r ~/temp/ldar-be/DEV/. $SERVER_DEV:/web-source/ldar-be
+      - rm -rf ~/temp/ldar-be/DEV/*
+      - ssh $SERVER_DEV "/usr/local/node/nodejs/bin/pm2 restart ldar_backend"
+      - echo "Deploy server Development berhasil"
+    only:
+      - development
+
+deploy_test:
+    stage: deploy
+    script:
+      - tar --exclude='./.git' --exclude='*.yml' --exclude='.gitignore' -zcvf ~/temp/ldar-be/TEST/ldar-be.tgz .
+      - tar -xzvf ~/temp/ldar-be/TEST/ldar-be.tgz -C ~/temp/ldar-be/TEST
+      - rm -rf ~/temp/ldar-be/TEST/ldar-be.tgz
+      - scp -r ~/temp/ldar-be/TEST/. $SERVER_TEST:/web-source/ldar-be
+      - rm -rf ~/temp/ldar-be/TEST/*
+      - ssh $SERVER_TEST "/usr/local/node/nodejs/bin/pm2 restart ldar_backend"
+      - echo "Deploy server Testing berhasil"
+    only:
+      - test
+
+deploy_prod:
+    stage: deploy
+    script:
+      - tar --exclude='./.git' --exclude='*.yml' --exclude='.gitignore' -zcvf ~/temp/ldar-be/PROD/ldar-be.tgz .
+      - tar -xzvf ~/temp/ldar-be/PROD/ldar-be.tgz -C ~/temp/ldar-be/PROD
+      - rm -rf ~/temp/ldar-be/PROD/ldar-be.tgz
+      - scp -r ~/temp/ldar-be/PROD/. $SERVER_PROD:/web-source/ldar-be
+      - rm -rf ~/temp/ldar-be/PROD/*
+      - ssh $SERVER_PROD "/usr/local/node/nodejs/bin/pm2 restart ldar_backend"
+      - echo "Deploy server Production berhasil"
+    only:
+      - /-RELEASE$/

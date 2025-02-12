@@ -1,0 +1,40 @@
+SELECT DISTINCT A.I_ID_LDAR "id",
+	I_LDAR "number",
+	I_ID_PGMMODEL "modelId",
+	A.I_ENTRY "submittedNik",
+	N_LDAR_SUBMITBY "submittedBy",
+	TO_CHAR(A.D_ENTRY, 'YYYY-MM-DD') "submittedDate",
+	I_LDAR_PHONE "phone",
+	C_LDAR_LSNUNIT "LSNUnit",
+	A_LDAR_LOC "location",
+	I_LDAR_TOSPV "EDMNik",
+	N_LDAR_TOSPV "EDMName",
+	TO_CHAR(D_LDAR_TOSPV, 'YYYY-MM-DD') "EDMDate",
+	C_LDAR_REFBY "refCode",
+	I_LDAR_REFBY "refNumber",
+	I_LDAR_ATTENTION "PENik",
+	N_LDAR_ATTENTION "PEName",
+	TO_CHAR(D_LDAR_ATTENTION, 'YYYY-MM-DD') "PEDate",
+	N_LDAR_GRP "group",
+	C_LDAR_VER "version",
+	I_DRAW "drawingNumber",
+	C_LDAR_IDX "drawingIndex",
+	E_LDAR_DESIGNATION "drawingDesignation",
+	E_LDAR_REMARK "remark",
+	Q_LDAR_MANHOUR "manHour",
+	E_LDAR_DISPORSN "acceptedReason",
+	E_LDAR_PLANREVIEW "planningReview",
+	F_LDAR_DRAWSEE "drawingFlag",
+	F_LDAR_OTHR "otherFlag",
+	F_LDAR_RSN "reasonFlag",
+	F_LDAR_INDICAT "indicatedFlag",
+	C_LDAR_STAT "status",
+	TO_CHAR(D_LDAR_STAT, 'YYYY-MM-DD') "statusDate",
+	CASE
+		WHEN C.I_ID_LDARFILE IS NOT NULL THEN '1'
+		ELSE '0'
+	END "fileEli",
+	CASE
+		WHEN D.I_ID_LDARFILE IS NOT NULL THEN '1'
+		ELSE '0'
+	END "filePEDE"

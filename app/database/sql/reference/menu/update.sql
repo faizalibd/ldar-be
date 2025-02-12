@@ -1,0 +1,12 @@
+UPDATE
+	DBAPDM.TRLDARMENU
+SET
+	N_LDAR_MENU = :name,
+	I_ID_PARENT = :parentId,
+	N_LDAR_URLMENU = :url,
+	C_LDAR_SORTMENU = :code,
+	N_LDAR_ICONMENU = :icon,
+	I_UPDATE = :updateUser,
+	D_UPDATE = CURRENT_DATE
+WHERE
+	I_ID_LDARMENU = :id

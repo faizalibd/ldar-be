@@ -1,0 +1,16 @@
+INSERT
+	INTO
+	DBAPDM.TRLDARROLEMENU
+(
+	I_ID_LDARMENU,
+	I_ID_LDARROLE,
+	I_ENTRY,
+	D_ENTRY
+)
+VALUES
+(
+	:menuId,
+	:roleId,
+	:insertUser,
+	CURRENT_DATE
+)

@@ -1,0 +1,6 @@
+SELECT
+	I_ID_LDARROLE "id",
+	N_ROLE "name",
+	E_ROLE "description"
+FROM
+	DBAPDM.TRLDARROLE

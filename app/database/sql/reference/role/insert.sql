@@ -1,0 +1,16 @@
+INSERT
+	INTO
+	DBAPDM.TRLDARROLE
+(
+	N_ROLE,
+	E_ROLE,
+	I_ENTRY,
+	D_ENTRY
+)
+VALUES
+(
+	:name,
+	:description,
+	:insertUser,
+	CURRENT_DATE
+)
