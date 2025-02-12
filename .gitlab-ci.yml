@@ -42,7 +42,6 @@ deploy_test:
     only:
       - test
 
-
 deploy_prod:
     stage: deploy
     script:
