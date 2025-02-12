@@ -54,3 +54,4 @@ deploy_prod:
       - echo "Deploy server Production berhasil"
     only:
       - /-RELEASE$/
+      
