@@ -27,7 +27,7 @@ VALUES (
                     '0'
                 ) || '-ELI'
             FROM DBAPDM.TMLDAR
-            WHERE TO_CHAR(D_ENTRY, 'YYMM') = TO_CHAR(CURRENT_DATE, 'YYMM')
+            WHERE TO_CHAR(D_ENTRY, 'YY') = TO_CHAR(CURRENT_DATE, 'YY')
         ),
         :modelId,
         :submittedBy,
