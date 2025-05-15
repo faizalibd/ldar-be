@@ -178,10 +178,12 @@ class LDARRepository {
       ).rows.map(async (d) => {
         if (d.modelId) {
           let model = await api.engineering.model.get(token, d.modelId);
-          d.modelCode = model.kode;
-          d.modelName = model.nama;
-          d.programCode = model.kode_program;
-          d.programName = model.nama_program;
+          if (model) {
+            d.modelCode = model.kode;
+            d.modelName = model.nama;
+            d.programCode = model.kode_program;
+            d.programName = model.nama_program;
+          }
         }
         return d;
       })
@@ -325,36 +327,35 @@ class LDARRepository {
     values.LSNUnit = submittedBy[0].organisasi;
     return await this.db
       .execute("dbapdm", sql.ldar.insert, values, { autoCommit: true })
-      .then(
-        async () =>
-          (
-            await this.get(
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              values.refCode,
-              values.refNumber,
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              headers.authorization
-            )
-          )[0]
-      )
+      .then(async () => {
+        const result = await this.get(
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          values.refCode,
+          values.refNumber,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          headers.authorization
+        );
+
+        return result[result.length - 1];
+      })
       .catch((err) => {
         throw err;
       });
@@ -441,7 +442,8 @@ class LDARRepository {
             data = (
               await this.approval.get("", values.id, "", result.PENik)
             )[0];
-            await this.approval.update_func(
+
+            let res = await this.approval.update_func(
               {
                 id: data.id,
                 typeCode: "3",
@@ -456,9 +458,11 @@ class LDARRepository {
             //     nik: AWOPNik,
             //     insertUser: values.updateUser,
             //   });
-            //   code = 4;
-            //   to = (await this.userRole.get(AWOPNik))[0].email;
+            // code = 4;
+            // to = (await this.userRole.get(AWOPNik))[0].email;
             // }
+            code = 4;
+            to = (await api.info.employee.get(result.EDMNik))[0].email;
             break;
           case "6":
             data = (
@@ -567,8 +571,13 @@ class LDARRepository {
   }
 
   async updateStatus(values, token) {
+    let val = {
+      id: values.id,
+      status: values.status,
+      updateUser: values.updateUser,
+    };
     return await this.db
-      .execute("dbapdm", sql.ldar.update_status, values, { autoCommit: true })
+      .execute("dbapdm", sql.ldar.update_status, val, { autoCommit: true })
       .then(
         async () =>
           (
