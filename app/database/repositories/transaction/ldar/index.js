@@ -630,35 +630,35 @@ class LDARRepository {
 
     switch (code) {
       case 1:
-        subject = "New LDAR";
+        subject = `New LDAR No. ${number} registered`;
         text = `Engineering Liaison has been registered LDAR number ${number}, please clarify & advise as soon as possible.`;
         break;
       case 2:
-        subject = "Email to CE/PE (Assigned CE/PE)";
+        subject = `LDAR No. ${number} has been Assigned to CE/PE`;
         text = `LDAR No. ${number} has been created by Liaison Engineer, Please review & check LDAR No. ${number}.`;
         break;
       case 3:
-        subject = "Email to PL/DE (Assigned PL/DE)";
+        subject = `LDAR No. ${number} has been Assigned to PL/DE`;
         text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
         break;
       case 4:
-        subject = "Email to AWO Panel 0 (Approve CE/PE)";
+        subject = `LDAR No. ${number} has been Approved by CE/PE`;
         text = `Problem on LDAR No. ${number} has been evaluated, please completed LDAR No. ${number} with justification.`;
         break;
       case 5:
-        subject = "Email to AWO Panel 0 (Reject CE/PE)";
+        subject = `LDAR No. ${number} has been Rejected by CE/PE`;
         text = `Problem on LDAR No. ${number} has been completely checked, please release & distribution LDAR No. ${number}.`;
         break;
-      case 6:
-        subject = "Email to PE & EDM (Approve AWO Panel)";
-        text = `LDAR No. ${number} has been completly checked, please see correction from design.`;
-        break;
-      case 7:
-        subject = "Email to PE & EDM (Reject AWO Panel)";
-        text = `LDAR No. ${number} need review disposition, Please check and justify.`;
-        break;
+      // case 6:
+      //   subject = "Email to PE & EDM (Approve AWO Panel)";
+      //   text = `LDAR No. ${number} has been completly checked, please see correction from design.`;
+      //   break;
+      // case 7:
+      //   subject = "Email to PE & EDM (Reject AWO Panel)";
+      //   text = `LDAR No. ${number} need review disposition, Please check and justify.`;
+      //   break;
       case 8:
-        subject = "Email to ELI (Closing)";
+        subject = `LDAR No. ${number} has been Closed`;
         text = `LDAR No. ${number} has been completely checked, please use as a reference.`;
         break;
     }
