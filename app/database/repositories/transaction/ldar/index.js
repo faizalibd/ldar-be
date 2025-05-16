@@ -630,7 +630,7 @@ class LDARRepository {
 
     switch (code) {
       case 1:
-        subject = `New LDAR No. ${number} has been registered`;
+        subject = `LDAR No. ${number} has been registered`;
         text = `Engineering Liaison has been registered LDAR number ${number}, please clarify & advise as soon as possible.`;
         break;
       case 2:
