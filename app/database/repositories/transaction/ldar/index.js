@@ -634,19 +634,19 @@ class LDARRepository {
         text = `Engineering Liaison has been registered LDAR number ${number}, please clarify & advise as soon as possible.`;
         break;
       case 2:
-        subject = "Email to PE (Assigned PE)";
+        subject = "Email to CE/PE (Assigned CE/PE)";
         text = `LDAR No. ${number} has been created by Liaison Engineer, Please review & check LDAR No. ${number}.`;
         break;
       case 3:
-        subject = "Email to DE (Assigned DE)";
+        subject = "Email to PL/DE (Assigned PL/DE)";
         text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
         break;
       case 4:
-        subject = "Email to AWO Panel 0 (Approve PE)";
+        subject = "Email to AWO Panel 0 (Approve CE/PE)";
         text = `Problem on LDAR No. ${number} has been evaluated, please completed LDAR No. ${number} with justification.`;
         break;
       case 5:
-        subject = "Email to AWO Panel 0 (Reject PE)";
+        subject = "Email to AWO Panel 0 (Reject CE/PE)";
         text = `Problem on LDAR No. ${number} has been completely checked, please release & distribution LDAR No. ${number}.`;
         break;
       case 6:
