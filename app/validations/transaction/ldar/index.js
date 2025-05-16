@@ -108,29 +108,29 @@ exports.add = [
         );
       }
 
-      found =
-        (await db.transaction.ldar.exists(
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          req.body.refCode,
-          val
-        )) == 1;
-      if (found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.ALREADY_EXIST,
-              "Reference Number"
-            )
-        );
-      }
+      // found =
+      //   (await db.transaction.ldar.exists(
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     req.body.refCode,
+      //     val
+      //   )) == 1;
+      // if (found) {
+      //   throw new Error(
+      //     MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+      //       "|" +
+      //       MessageProvider.message(
+      //         Messages.KEYS.ALREADY_EXIST,
+      //         "Reference Number"
+      //       )
+      //   );
+      // }
 
       return true;
     }),
@@ -331,38 +331,38 @@ exports.update = [
         );
       }
 
-      found =
-        (await db.transaction.ldar.exists(
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          req.body.refCode,
-          val,
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          req.body.id
-        )) == 1;
-      if (found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.ALREADY_EXIST,
-              "Reference Number"
-            )
-        );
-      }
+      // found =
+      //   (await db.transaction.ldar.exists(
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     req.body.refCode,
+      //     val,
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     "",
+      //     req.body.id
+      //   )) == 1;
+      // if (found) {
+      //   throw new Error(
+      //     MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
+      //       "|" +
+      //       MessageProvider.message(
+      //         Messages.KEYS.ALREADY_EXIST,
+      //         "Reference Number"
+      //       )
+      //   );
+      // }
 
       return true;
     }),
