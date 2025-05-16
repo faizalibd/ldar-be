@@ -178,10 +178,12 @@ class LDARRepository {
       ).rows.map(async (d) => {
         if (d.modelId) {
           let model = await api.engineering.model.get(token, d.modelId);
-          d.modelCode = model.kode;
-          d.modelName = model.nama;
-          d.programCode = model.kode_program;
-          d.programName = model.nama_program;
+          if (model) {
+            d.modelCode = model.kode;
+            d.modelName = model.nama;
+            d.programCode = model.kode_program;
+            d.programName = model.nama_program;
+          }
         }
         return d;
       })
@@ -325,36 +327,35 @@ class LDARRepository {
     values.LSNUnit = submittedBy[0].organisasi;
     return await this.db
       .execute("dbapdm", sql.ldar.insert, values, { autoCommit: true })
-      .then(
-        async () =>
-          (
-            await this.get(
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              values.refCode,
-              values.refNumber,
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              headers.authorization
-            )
-          )[0]
-      )
+      .then(async () => {
+        const result = await this.get(
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          values.refCode,
+          values.refNumber,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          headers.authorization
+        );
+
+        return result[result.length - 1];
+      })
       .catch((err) => {
         throw err;
       });
@@ -441,7 +442,8 @@ class LDARRepository {
             data = (
               await this.approval.get("", values.id, "", result.PENik)
             )[0];
-            await this.approval.update_func(
+
+            let res = await this.approval.update_func(
               {
                 id: data.id,
                 typeCode: "3",
@@ -456,9 +458,11 @@ class LDARRepository {
             //     nik: AWOPNik,
             //     insertUser: values.updateUser,
             //   });
-            //   code = 4;
-            //   to = (await this.userRole.get(AWOPNik))[0].email;
+            // code = 4;
+            // to = (await this.userRole.get(AWOPNik))[0].email;
             // }
+            code = 4;
+            to = (await api.info.employee.get(result.EDMNik))[0].email;
             break;
           case "6":
             data = (
@@ -567,8 +571,13 @@ class LDARRepository {
   }
 
   async updateStatus(values, token) {
+    let val = {
+      id: values.id,
+      status: values.status,
+      updateUser: values.updateUser,
+    };
     return await this.db
-      .execute("dbapdm", sql.ldar.update_status, values, { autoCommit: true })
+      .execute("dbapdm", sql.ldar.update_status, val, { autoCommit: true })
       .then(
         async () =>
           (
@@ -621,35 +630,35 @@ class LDARRepository {
 
     switch (code) {
       case 1:
-        subject = "New LDAR";
+        subject = `LDAR No. ${number} has been registered`;
         text = `Engineering Liaison has been registered LDAR number ${number}, please clarify & advise as soon as possible.`;
         break;
       case 2:
-        subject = "Email to PE (Assigned PE)";
+        subject = `LDAR No. ${number} has been Assigned to CE/PE`;
         text = `LDAR No. ${number} has been created by Liaison Engineer, Please review & check LDAR No. ${number}.`;
         break;
       case 3:
-        subject = "Email to DE (Assigned DE)";
+        subject = `LDAR No. ${number} has been Assigned to PL/DE`;
         text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
         break;
       case 4:
-        subject = "Email to AWO Panel 0 (Approve PE)";
+        subject = `LDAR No. ${number} has been Approved by CE/PE`;
         text = `Problem on LDAR No. ${number} has been evaluated, please completed LDAR No. ${number} with justification.`;
         break;
       case 5:
-        subject = "Email to AWO Panel 0 (Reject PE)";
+        subject = `LDAR No. ${number} has been Rejected by CE/PE`;
         text = `Problem on LDAR No. ${number} has been completely checked, please release & distribution LDAR No. ${number}.`;
         break;
-      case 6:
-        subject = "Email to PE & EDM (Approve AWO Panel)";
-        text = `LDAR No. ${number} has been completly checked, please see correction from design.`;
-        break;
-      case 7:
-        subject = "Email to PE & EDM (Reject AWO Panel)";
-        text = `LDAR No. ${number} need review disposition, Please check and justify.`;
-        break;
+      // case 6:
+      //   subject = "Email to PE & EDM (Approve AWO Panel)";
+      //   text = `LDAR No. ${number} has been completly checked, please see correction from design.`;
+      //   break;
+      // case 7:
+      //   subject = "Email to PE & EDM (Reject AWO Panel)";
+      //   text = `LDAR No. ${number} need review disposition, Please check and justify.`;
+      //   break;
       case 8:
-        subject = "Email to ELI (Closing)";
+        subject = `LDAR No. ${number} has been Closed`;
         text = `LDAR No. ${number} has been completely checked, please use as a reference.`;
         break;
     }
