@@ -50,6 +50,9 @@ const classApi = {
     customer: {
       api: require("./sap/customer"),
     },
+    elr: {
+      api: require("./sap/elr"),
+    },
   },
   siedm: {
     drawing: {
@@ -82,6 +85,9 @@ const api = {
       connection: connection.sap,
     }),
     customer: new classApi.sap.customer.api({
+      connection: connection.sap,
+    }),
+    elr: new classApi.sap.elr.api({
       connection: connection.sap,
     }),
   },
