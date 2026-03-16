@@ -8,5 +8,6 @@ const { transaction: controller } = require("../app/controllers");
 const { transaction: validation } = require("../app/validations");
 
 router.get("/ref", controller.sap.get);
+router.get("/elr", controller.sap.getElr);
 
 module.exports = router;

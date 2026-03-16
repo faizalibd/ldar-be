@@ -51,6 +51,30 @@ class SAPRepository {
 
     return result;
   }
+
+  async getElr(limit = null, offset = 0, number) {
+    let dataSAP = await api.sap.elr.getElr(number);
+    let array = dataSAP;
+
+    limit = limit ? limit : array ? array.length : 0;
+    if (limit) {
+      limit = array.length < limit ? array.length : limit;
+    } else {
+      limit = array ? array.length : 0;
+    }
+
+    offset = offset ? offset : 0;
+
+    let result = [];
+    for (let i = offset; i < +limit + +offset; i++) {
+      if (array[i] != null) {
+        result.push(array[i]);
+      }
+    }
+    // console.log(result);
+
+    return result;
+  }
 }
 
 module.exports = SAPRepository;
