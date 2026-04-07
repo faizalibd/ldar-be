@@ -51,6 +51,7 @@ module.exports = {
       update_pe_manhour: sql("/transaction/ldar/update_pe_manhour.sql"),
       update_pe: sql("/transaction/ldar/update_pe.sql"),
       update_status: sql("/transaction/ldar/update_status.sql"),
+      update_admin: sql("/transaction/ldar/update_admin.sql"),
       delete: sql("/transaction/ldar/delete.sql"),
       approval: {
         select: sql("/transaction/ldar/approval/select.sql"),
@@ -58,6 +59,7 @@ module.exports = {
         insert: sql("/transaction/ldar/approval/insert.sql"),
         update: sql("/transaction/ldar/approval/update.sql"),
         delete: sql("/transaction/ldar/approval/delete.sql"),
+        update_admin: sql("/transaction/ldar/approval/update_admin.sql"),
       },
       file: {
         select: sql("/transaction/ldar/file/select.sql"),
@@ -65,6 +67,7 @@ module.exports = {
         insert: sql("/transaction/ldar/file/insert.sql"),
         update: sql("/transaction/ldar/file/update.sql"),
         delete: sql("/transaction/ldar/file/delete.sql"),
+        update_admin: sql("/transaction/ldar/file/update_admin.sql"),
       },
       drawing: {
         select: sql("/transaction/ldar/drawing/select.sql"),

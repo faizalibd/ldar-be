@@ -35,7 +35,7 @@ class LDARRepository {
     nikApproval,
     limit,
     offset,
-    token
+    token,
   ) {
     let additionalSelect = "";
     let from = ` FROM DBAPDM.TMLDAR A LEFT JOIN DBAPDM.TMLDARAPRV B ON A.I_ID_LDAR = B.I_ID_LDAR 
@@ -173,7 +173,7 @@ class LDARRepository {
             condition +
             orderby +
             rows,
-          values
+          values,
         )
       ).rows.map(async (d) => {
         if (d.modelId) {
@@ -186,7 +186,7 @@ class LDARRepository {
           }
         }
         return d;
-      })
+      }),
     );
 
     if (id) {
@@ -194,7 +194,7 @@ class LDARRepository {
         result.map(async (d) => {
           d.unit = (await api.info.employee.get(d.EDMNik))[0].organisasi;
           return d;
-        })
+        }),
       );
     }
     return result;
@@ -219,7 +219,7 @@ class LDARRepository {
     drawingIndex,
     status,
     statusDate,
-    idNot
+    idNot,
   ) {
     let condition = " WHERE 1=1";
     let values = {};
@@ -351,7 +351,7 @@ class LDARRepository {
           "",
           "",
           "",
-          headers.authorization
+          headers.authorization,
         );
 
         return result[result.length - 1];
@@ -406,11 +406,11 @@ class LDARRepository {
             code = 1;
             to = (
               await Promise.all(
-                (
-                  await this.userRole.get("", "", "AWOP")
-                )[0].user.map(async (u) => {
-                  return u.email;
-                })
+                (await this.userRole.get("", "", "AWOP"))[0].user.map(
+                  async (u) => {
+                    return u.email;
+                  },
+                ),
               )
             ).join(",");
             break;
@@ -429,7 +429,7 @@ class LDARRepository {
                     insertUser: values.updateUser,
                   });
                   return (await api.info.employee.get(n))[0].email;
-                })
+                }),
               )
             ).join(",");
             await this.approval.add_func({
@@ -450,7 +450,7 @@ class LDARRepository {
                 remark: remark,
                 updateUser: values.updateUser,
               },
-              file
+              file,
             );
             // if (result.refCode == 3) {
             //   await this.approval.add_func({
@@ -475,7 +475,7 @@ class LDARRepository {
                 remark: remark,
                 updateUser: values.updateUser,
               },
-              file
+              file,
             );
             code = 5;
             to = (await api.info.employee.get(result.EDMNik))[0].email;
@@ -491,7 +491,7 @@ class LDARRepository {
                 remark: remark,
                 updateUser: values.updateUser,
               },
-              file
+              file,
             );
             code = 6;
             to =
@@ -510,7 +510,7 @@ class LDARRepository {
                 remark: remark,
                 updateUser: values.updateUser,
               },
-              file
+              file,
             );
             code = 7;
             to =
@@ -561,9 +561,9 @@ class LDARRepository {
               "",
               "",
               "",
-              headers.authorization
+              headers.authorization,
             )
-          )[0]
+          )[0],
       )
       .catch((err) => {
         throw err;
@@ -604,9 +604,66 @@ class LDARRepository {
               "",
               "",
               "",
-              token
+              token,
             )
-          )[0]
+          )[0],
+      )
+      .catch((err) => {
+        throw err;
+      });
+  }
+
+  async updateStatusAdmin(values, token) {
+    let val = {
+      id: values.id,
+      status: values.status,
+    };
+    let updated = "";
+    let condition = " WHERE i_id_ldar = :id";
+
+    switch (status) {
+      case 0:
+        updated =
+          " SET i_ldar_attention = :i_ldar_attention, n_ldar_grp = :n_ldar_grp";
+        break;
+      case 1:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+    }
+
+    return await this.db
+      .execute("dbapdm", sql.ldar.update_status + updated + condition, val, {
+        autoCommit: true,
+      })
+      .then(
+        async () =>
+          (
+            await this.get(
+              values.id,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              token,
+            )
+          )[0],
       )
       .catch((err) => {
         throw err;
