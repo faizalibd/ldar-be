@@ -619,14 +619,38 @@ class LDARRepository {
       status: values.status,
     };
     let updated = "";
-    let condition = " WHERE i_id_ldar = :id";
+    let condition = " WHERE i_id_ldar = :val.id";
 
-    switch (status) {
+    switch (val.status) {
       case 0:
         updated =
-          " SET i_ldar_attention = :i_ldar_attention, n_ldar_grp = :n_ldar_grp";
+          " SET C_LDAR_STAT = :status, D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE, I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' ";
         break;
       case 1:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 2:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 3:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 4:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 5:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 6:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 9:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 10:
+        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+        break;
+      case 11:
         updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
         break;
     }
