@@ -38,13 +38,13 @@ exports.get = async (req, res) => {
       req.query.nikApproval,
       req.query.limit,
       req.query.offset,
-      req.headers.authorization
+      req.headers.authorization,
     );
     if (!result.length) {
       response.code = MessageProvider.status(Messages.KEYS.NOT_FOUND);
       response.message = MessageProvider.message(
         Messages.KEYS.NOT_FOUND,
-        "LDAR"
+        "LDAR",
       );
     } else {
       response.data = result.length == 1 ? result[0] : result;
@@ -54,7 +54,7 @@ exports.get = async (req, res) => {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.ERROR,
-      "LDAR"
+      "LDAR",
     )} ${error.message || error}`;
   }
   res.status(response.code).json(response);
@@ -73,7 +73,7 @@ exports.add = async (req, res) => {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.ERROR,
-      "LDAR"
+      "LDAR",
     )} ${error.message || error}`;
   }
   res.status(response.code).json(response);
@@ -91,7 +91,25 @@ exports.update = async (req, res) => {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.UPDATE_ERROR,
-      "LDAR"
+      "LDAR",
+    )} - ${error.message || error}`;
+  }
+  res.status(response.code).json(response);
+};
+
+exports.update_admin = async (req, res) => {
+  let response = {
+    code: MessageProvider.status(Messages.KEYS.UPDATE_SUCCESS),
+    data: null,
+    message: MessageProvider.message(Messages.KEYS.UPDATE_SUCCESS, "LDAR"),
+  };
+  try {
+    response.data = await db.transaction.ldar.update(req);
+  } catch (error) {
+    response.code = MessageProvider.status(Messages.KEYS.ERROR);
+    response.message = `${MessageProvider.message(
+      Messages.KEYS.UPDATE_ERROR,
+      "LDAR",
     )} - ${error.message || error}`;
   }
   res.status(response.code).json(response);
@@ -110,7 +128,7 @@ exports.delete = async (req, res) => {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.ERROR,
-      "LDAR"
+      "LDAR",
     )} ${error.message || error}`;
   }
   res.status(response.code).json(response);

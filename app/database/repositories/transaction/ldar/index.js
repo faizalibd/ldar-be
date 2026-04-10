@@ -618,47 +618,49 @@ class LDARRepository {
       id: values.id,
       status: values.status,
     };
-    let updated = "";
+    let updatedLdar =
+      " SET C_LDAR_STAT = :status, D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE";
+    let updatedApproval = " ";
+    let updatedFile = " ";
+    let updatedDrawing = " ";
     let condition = " WHERE i_id_ldar = :val.id";
 
     switch (val.status) {
-      case 0:
-        updated =
-          " SET C_LDAR_STAT = :status, D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE, I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' ";
+      case "0":
+        updatedLdar += ` ,I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
+          N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
+        updatedFile = " ";
         break;
-      case 1:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+      case "1":
+        updatedLdar += ` ,I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
+          N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
         break;
-      case 2:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+      case "2":
+        updatedLdar += ` ,Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
         break;
-      case 3:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+      case "3":
+        updatedLdar += ` ,Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
         break;
-      case 4:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+      case "4a":
+        updatedLdar += ` ,E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
         break;
-      case 5:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+      case "4b":
+        updatedLdar += ` ,E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
         break;
-      case 6:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
-        break;
-      case 9:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
-        break;
-      case 10:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
-        break;
-      case 11:
-        updated = " SET f_ldar_drawsee = :f_ldar_drawsee";
+      default:
+        // tidak ada tambahan
         break;
     }
 
-    return await this.db
-      .execute("dbapdm", sql.ldar.update_status + updated + condition, val, {
-        autoCommit: true,
-      })
+    let ldar = await this.db
+      .execute(
+        "dbapdm",
+        sql.ldar.update_status_admin + updated + condition,
+        val,
+        {
+          autoCommit: true,
+        },
+      )
       .then(
         async () =>
           (
@@ -692,6 +694,51 @@ class LDARRepository {
       .catch((err) => {
         throw err;
       });
+
+    let file = await this.db
+      .execute(
+        "dbapdm",
+        sql.ldar.file.update_admin + updated + condition,
+        val,
+        {
+          autoCommit: true,
+        },
+      )
+      .then(
+        async () =>
+          (
+            await this.get(
+              values.id,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              token,
+            )
+          )[0],
+      )
+      .catch((err) => {
+        throw err;
+      });
+
+    return { ldar, file };
   }
 
   async delete({ body: { id } }) {
