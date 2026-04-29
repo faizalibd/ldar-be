@@ -616,10 +616,11 @@ class LDARRepository {
   async updateStatusAdmin(values, token) {
     let val = {
       id: values.id,
-      status: values.status,
+      toStatus: values.toStatus,
+      fromStatus: values.fromStatus,
     };
     let updatedLdar =
-      " SET C_LDAR_STAT = :status, D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE";
+      " SET C_LDAR_STAT = :toStatus, D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE";
     let updatedApproval = " ";
     let updatedFile = " ";
     let updatedDrawing = " ";
@@ -648,7 +649,7 @@ class LDARRepository {
         updatedLdar += ` ,E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
         break;
       default:
-        // tidak ada tambahan
+        // tidak ada tambahan query
         break;
     }
 

@@ -1310,145 +1310,8 @@ exports.update_status_admin = [
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5),
-    )
-    .bail()
-    .custom(async (val, { req }) => {
-      let found;
-      let allowed;
-      let ref;
-      let user;
-      switch (req.body.status) {
-        case "1":
-          allowed = "0";
-          user = "AWOP";
-          break;
-        case "2":
-          allowed = "1";
-          break;
-        case "4":
-          allowed = "3";
-          user = "DE";
-          break;
-        case "5":
-          allowed = "4";
-          break;
-        case "6":
-          allowed = "4";
-          break;
-        case "7":
-          ref = "3";
-          // ref = "1,2,9";
-          allowed = "5";
-          break;
-        case "8":
-          ref = "3";
-          // ref = "1,2,9";
-          allowed = "5";
-          break;
-        case "9":
-          allowed = "5,6,7,8";
-          break;
-        case "10":
-          allowed = "5,6,7,8";
-          break;
-      }
-      found =
-        (await db.transaction.ldar.exists(
-          val,
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          ref,
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          allowed,
-        )) == 1;
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.NOT_FOUND,
-              "LDAR with Status " +
-                allowed.split(",").join(", ") +
-                (ref ? " and Reference ELR Document" : ""),
-            ),
-        );
-      }
-
-      // AWOP ref 1 = false
-      // AWOP ref 0 = true
-      // EDM ref X = false
-      found = !user || (await db.reference.user_role.exists("", "", user)) >= 1;
-
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(
-              Messages.KEYS.NOT_FOUND,
-              `Employee (${user})`,
-            ),
-        );
-      }
-
-      let data = (
-        await db.transaction.ldar.get(
-          val,
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          req.headers.authorization,
-        )
-      )[0];
-
-      found =
-        !["5", "6"].includes(req.body.status) ||
-        (await db.transaction.ldar.approval.exists(
-          "",
-          val,
-          "0",
-          "",
-          "",
-          data.PENik,
-        )) == 0;
-      if (!found) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
-            "|There's still approval to be done",
-        );
-      }
-
-      return true;
-    }),
-  body("status")
+    ),
+  body("toStatus")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
@@ -1470,147 +1333,52 @@ exports.update_status_admin = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Status", 1),
     )
     .bail()
-    .isIn(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
+    .isIn(["0", "1", "2", "3", "4", "5", "6", "9", "10", "11", "12"])
     .withMessage(
       MessageProvider.status(Messages.KEYS.IN) +
         "|" +
         MessageProvider.message(
           Messages.KEYS.IN,
           "Status",
-          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed; 10 = Closed ",
+          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed (Accepted); 10 = Closed (Rejected); 11 = Closed (Accepted); 12 = Closed (Rejected);",
         ),
     ),
-  body("nik").custom(async (val, { req }) => {
-    if (req.body.status == "4") {
-      let valid = Array.isArray(val) && val.length > 0;
+  body("fromStatus")
+    .notEmpty()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Status"),
+    )
+    .bail()
+    .isNumeric()
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.NUMERIC) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Status"),
+    )
+    .bail()
+    .isLength({ max: 2 })
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
+        "|" +
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Status", 1),
+    )
+    .bail()
+    .custom(async (val, { req }) => {
+      let valid = true;
+
+      valid = val > body("toStatus");
       if (!valid) {
         throw new Error(
-          MessageProvider.status(Messages.KEYS.MIN_ARRAY) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.MIN_ARRAY, "NIK List", "1"),
+          MessageProvider.message(
+            "Status tujuan harus lebih kecil dari status awal",
+          ),
         );
       }
 
-      let seen = new Set();
-      valid = !val.some((d) => {
-        return seen.size === seen.add(d).size;
-      });
-      if (!valid) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
-            "|" +
-            "Duplicate NIK",
-        );
-      }
-
-      valid = val.every((d) => {
-        return d != null && d != undefined && d != "";
-      });
-      if (!valid) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK"),
-        );
-      }
-
-      valid = val.every((d) => {
-        return d.length <= 6;
-      });
-      if (!valid) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6),
-        );
-      }
-
-      valid = await Promise.all(
-        req.body.nik.map(async (d) => {
-          return (
-            (await api.info.employee.get(d)) &&
-            (await db.reference.user_role.exists(d, "", "DE")) == 1
-          );
-        }),
-      ).then((arr) => arr.every((a) => a));
-      if (!valid) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (DE)"),
-        );
-      }
-    }
-    return true;
-  }),
-  body("remark").custom(async (val, { req }) => {
-    let valid = true;
-
-    valid =
-      !["5", "6", "7", "8"].includes(req.body.status) ||
-      !val ||
-      val.length <= 1000;
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Remark", 1000),
-      );
-    }
-
-    return true;
-  }),
-  check("file").custom(async (val, { req }) => {
-    let valid = false;
-
-    valid =
-      !["5", "6", "7", "8"].includes(req.body.status) ||
-      !req.file ||
-      req.file.originalname.length <= 250;
-    if (!valid) {
-      throw new Error(
-        MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-          "|" +
-          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "File", 250),
-      );
-    }
-
-    return true;
-  }),
-  // body("AWOPNik").custom(async (val, { req }) => {
-  //   let valid = true;
-
-  //   valid = !(req.body.status == "5") || val;
-  //   if (!valid) {
-  //     throw new Error(
-  //       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-  //         "|" +
-  //         MessageProvider.message(Messages.KEYS.NOT_EMPTY, "AWOP Nik")
-  //     );
-  //   }
-  //   valid = !(req.body.status == "5") || val.length <= 6;
-  //   if (!valid) {
-  //     throw new Error(
-  //       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
-  //         "|" +
-  //         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "AWOP Nik", 6)
-  //     );
-  //   }
-
-  //   valid =
-  //     !(req.body.status == "5") ||
-  //     ((await api.info.employee.get(val)) &&
-  //       (await db.reference.user_role.exists(val, "", "AWOP")) == 1);
-  //   if (!valid) {
-  //     throw new Error(
-  //       MessageProvider.status(Messages.KEYS.NOT_FOUND) +
-  //         "|" +
-  //         MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
-  //     );
-  //   }
-
-  //   return true;
-  // }),
+      return true;
+    }),
   body("entry")
     .notEmpty()
     .withMessage(
