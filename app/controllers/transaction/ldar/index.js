@@ -104,7 +104,9 @@ exports.update_admin = async (req, res) => {
     message: MessageProvider.message(Messages.KEYS.UPDATE_SUCCESS, "LDAR"),
   };
   try {
-    response.data = await db.transaction.ldar.update(req);
+    console.log(req.body);
+
+    response.data = await db.transaction.ldar.updateStatusAdmin(req);
   } catch (error) {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(

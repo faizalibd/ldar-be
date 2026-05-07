@@ -12,6 +12,8 @@ exports.validate = (validations) => {
       return next();
     }
     let err = errors.array()[0].msg;
+    console.log(err);
+
     let response = {
       code: err.split("|")[0],
       data: null,

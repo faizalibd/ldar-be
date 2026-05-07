@@ -59,7 +59,7 @@ module.exports = {
         insert: sql("/transaction/ldar/approval/insert.sql"),
         update: sql("/transaction/ldar/approval/update.sql"),
         delete: sql("/transaction/ldar/approval/delete.sql"),
-        update_admin: sql("/transaction/ldar/approval/update_admin.sql"),
+        delete_admin: sql("/transaction/ldar/approval/delete_admin.sql"),
       },
       file: {
         select: sql("/transaction/ldar/file/select.sql"),

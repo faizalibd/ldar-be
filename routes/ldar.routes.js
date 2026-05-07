@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer();
 const { validate } = require("../core/middlewares/validator");
-const { parse, entry } = require("../core/middlewares/jsonParser");
+const { parse, entry, parseStatus } = require("../core/middlewares/jsonParser");
 const { transaction: controller } = require("../app/controllers");
 const { transaction: validation } = require("../app/validations");
 
@@ -98,8 +98,6 @@ router.put(
 );
 router.put(
   "/status/admin",
-  upload.single("file"),
-  parse("nik"),
   validate(validation.ldar.update_status_admin),
   entry("update"),
   controller.ldar.update_admin,

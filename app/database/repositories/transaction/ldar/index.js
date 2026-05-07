@@ -613,40 +613,44 @@ class LDARRepository {
       });
   }
 
-  async updateStatusAdmin(values, token) {
+  async updateStatusAdmin({ body: values, headers }) {
+    console.log(values);
+
     let val = {
       id: values.id,
-      toStatus: values.toStatus,
-      fromStatus: values.fromStatus,
+      updateUser: values.updateUser,
     };
     let updatedLdar =
-      " SET C_LDAR_STAT = :toStatus, D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE";
-    let updatedApproval = " ";
+      " SET D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE, C_LDAR_STAT = :toStatus, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LDAR_INDICAT = ''";
     let updatedFile = " ";
     let updatedDrawing = " ";
-    let condition = " WHERE i_id_ldar = :val.id";
+    let conditionLdar = " WHERE i_id_ldar = :id";
+    let conditionApproval = " ";
 
-    switch (val.status) {
+    switch (values.toStatus) {
       case "0":
-        updatedLdar += ` ,I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
-          N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
-        updatedFile = " ";
+        updatedLdar += `, I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
+          N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0`;
+        val.toStatus = 0;
         break;
       case "1":
-        updatedLdar += ` ,I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
-          N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
+        updatedLdar += ` , I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
+          N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0`;
+        val.toStatus = 0;
         break;
       case "2":
-        updatedLdar += ` ,Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
+        updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
+        val.toStatus = 2;
         break;
       case "3":
-        updatedLdar += ` ,Q_LDAR_MANHOUR = 0, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
+        updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
+        val.toStatus = 3;
         break;
-      case "4a":
-        updatedLdar += ` ,E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
+      case "4":
+        val.toStatus = 4;
         break;
-      case "4b":
-        updatedLdar += ` ,E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LAR_INDICAT = '' `;
+      case "4.1":
+        val.toStatus = 4;
         break;
       default:
         // tidak ada tambahan query
@@ -656,7 +660,7 @@ class LDARRepository {
     let ldar = await this.db
       .execute(
         "dbapdm",
-        sql.ldar.update_status_admin + updated + condition,
+        sql.ldar.update_status_admin + updatedLdar + conditionLdar,
         val,
         {
           autoCommit: true,
@@ -688,7 +692,7 @@ class LDARRepository {
               "",
               "",
               "",
-              token,
+              headers.authorization,
             )
           )[0],
       )
@@ -696,50 +700,29 @@ class LDARRepository {
         throw err;
       });
 
-    let file = await this.db
-      .execute(
-        "dbapdm",
-        sql.ldar.file.update_admin + updated + condition,
-        val,
-        {
-          autoCommit: true,
-        },
-      )
-      .then(
-        async () =>
-          (
-            await this.get(
-              values.id,
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              token,
-            )
-          )[0],
-      )
-      .catch((err) => {
-        throw err;
-      });
+    if (values.fromStatus > 3) {
+      if (values.toStatus == 4) {
+        val.PENik = ldar.PENik;
+        conditionApproval += `WHERE I_ID_LDAR = :id AND I_LDAR_APRV != :PENik`;
+      } else if (values.toStatus < 4) {
+        conditionApproval += `WHERE I_ID_LDAR = :id `;
+      }
+      console.log(sql.ldar.approval.delete_admin + conditionApproval);
+      let approval = await this.db
+        .execute(
+          "dbapdm",
+          sql.ldar.approval.delete_admin + conditionApproval,
+          val,
+          {
+            autoCommit: true,
+          },
+        )
+        .catch((err) => {
+          throw err;
+        });
+    }
 
-    return { ldar, file };
+    return { ldar };
   }
 
   async delete({ body: { id } }) {
