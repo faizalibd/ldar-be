@@ -616,9 +616,12 @@ class LDARRepository {
   async updateStatusAdmin({ body: values, headers }) {
     console.log(values);
 
-    let val = {
+    let valLDAR = {
       id: values.id,
       updateUser: values.updateUser,
+    };
+    let valApprove = {
+      id: values.id,
     };
     let updatedLdar =
       " SET D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE, C_LDAR_STAT = :toStatus, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LDAR_INDICAT = ''";
@@ -631,26 +634,26 @@ class LDARRepository {
       case "0":
         updatedLdar += `, I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
           N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0`;
-        val.toStatus = 0;
+        valLDAR.toStatus = 0;
         break;
       case "1":
         updatedLdar += ` , I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
           N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0`;
-        val.toStatus = 0;
+        valLDAR.toStatus = 0;
         break;
       case "2":
         updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
-        val.toStatus = 2;
+        valLDAR.toStatus = 2;
         break;
       case "3":
         updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
-        val.toStatus = 3;
+        valLDAR.toStatus = 3;
         break;
       case "4":
-        val.toStatus = 4;
+        valLDAR.toStatus = 4;
         break;
       case "4.1":
-        val.toStatus = 4;
+        valLDAR.toStatus = 4;
         break;
       default:
         // tidak ada tambahan query
@@ -661,7 +664,7 @@ class LDARRepository {
       .execute(
         "dbapdm",
         sql.ldar.update_status_admin + updatedLdar + conditionLdar,
-        val,
+        valLDAR,
         {
           autoCommit: true,
         },
@@ -702,17 +705,20 @@ class LDARRepository {
 
     if (values.fromStatus > 3) {
       if (values.toStatus == 4) {
-        val.PENik = ldar.PENik;
+        valApprove.PENik = ldar.PENik;
         conditionApproval += `WHERE I_ID_LDAR = :id AND I_LDAR_APRV != :PENik`;
       } else if (values.toStatus < 4) {
         conditionApproval += `WHERE I_ID_LDAR = :id `;
       }
-      console.log(sql.ldar.approval.delete_admin + conditionApproval);
+      console.log(
+        sql.ldar.approval.delete_admin + conditionApproval,
+        valApprove,
+      );
       let approval = await this.db
         .execute(
           "dbapdm",
           sql.ldar.approval.delete_admin + conditionApproval,
-          val,
+          valApprove,
           {
             autoCommit: true,
           },
