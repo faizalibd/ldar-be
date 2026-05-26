@@ -623,105 +623,200 @@ class LDARRepository {
     let valApprove = {
       id: values.id,
     };
-    let updatedLdar =
-      " SET D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE, C_LDAR_STAT = :toStatus, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LDAR_INDICAT = ''";
     let updatedFile = " ";
     let updatedDrawing = " ";
     let conditionLdar = " WHERE i_id_ldar = :id";
     let conditionApproval = " ";
 
-    switch (values.toStatus) {
-      case "0":
-        updatedLdar += `, I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
+    if (values.toStatus < values.fromStatus) {
+      let updatedLdar =
+        " SET D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE, C_LDAR_STAT = :toStatus, E_LDAR_DISPORSN = '', E_LDAR_PLANREVIEW = '', F_LDAR_DRAWSEE = '', F_LDAR_OTHR = '', F_LDAR_RSN = '', F_LDAR_INDICAT = ''";
+      switch (values.toStatus) {
+        case "0":
+          updatedLdar += `, I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
           N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0`;
-        valLDAR.toStatus = 0;
-        break;
-      case "1":
-        updatedLdar += ` , I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
+          valLDAR.toStatus = 0;
+          break;
+        case "1":
+          updatedLdar += ` , I_LDAR_TOSPV = '', N_LDAR_TOSPV = '', D_LDAR_TOSPV = null, I_LDAR_ATTENTION = '', N_LDAR_ATTENTION = '', D_LDAR_ATTENTION = null, 
           N_LDAR_GRP = '', Q_LDAR_MANHOUR = 0`;
-        valLDAR.toStatus = 0;
-        break;
-      case "2":
-        updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
-        valLDAR.toStatus = 2;
-        break;
-      case "3":
-        updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
-        valLDAR.toStatus = 3;
-        break;
-      case "4":
-        valLDAR.toStatus = 4;
-        break;
-      case "4.1":
-        valLDAR.toStatus = 4;
-        break;
-      default:
-        // tidak ada tambahan query
-        break;
-    }
-
-    let ldar = await this.db
-      .execute(
-        "dbapdm",
-        sql.ldar.update_status_admin + updatedLdar + conditionLdar,
-        valLDAR,
-        {
-          autoCommit: true,
-        },
-      )
-      .then(
-        async () =>
-          (
-            await this.get(
-              values.id,
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-              headers.authorization,
-            )
-          )[0],
-      )
-      .catch((err) => {
-        throw err;
-      });
-
-    if (values.fromStatus > 3) {
-      if (values.toStatus == 4) {
-        valApprove.PENik = ldar.PENik;
-        conditionApproval += `WHERE I_ID_LDAR = :id AND I_LDAR_APRV != :PENik`;
-      } else if (values.toStatus < 4) {
-        conditionApproval += `WHERE I_ID_LDAR = :id `;
+          valLDAR.toStatus = 1;
+          break;
+        case "2":
+          updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
+          valLDAR.toStatus = 2;
+          break;
+        case "3":
+          updatedLdar += ` , Q_LDAR_MANHOUR = 0`;
+          valLDAR.toStatus = 3;
+          break;
+        case "4":
+          valLDAR.toStatus = 4;
+          break;
+        case "4.1":
+          valLDAR.toStatus = 4;
+          break;
+        case "5":
+          valLDAR.toStatus = 5;
+          break;
+        case "6":
+          valLDAR.toStatus = 6;
+          break;
+        case "9":
+          valLDAR.toStatus = 9;
+          break;
+        case "10":
+          valLDAR.toStatus = 10;
+          break;
+        default:
+          // tidak ada tambahan query
+          break;
       }
-      console.log(
-        sql.ldar.approval.delete_admin + conditionApproval,
-        valApprove,
-      );
-      let approval = await this.db
+
+      let ldar = await this.db
         .execute(
           "dbapdm",
-          sql.ldar.approval.delete_admin + conditionApproval,
-          valApprove,
+          sql.ldar.update_status_admin + updatedLdar + conditionLdar,
+          valLDAR,
           {
             autoCommit: true,
           },
+        )
+        .then(
+          async () =>
+            (
+              await this.get(
+                values.id,
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                headers.authorization,
+              )
+            )[0],
+        )
+        .catch((err) => {
+          throw err;
+        });
+
+      if (values.fromStatus > 3) {
+        if (values.toStatus == 4) {
+          valApprove.PENik = ldar.PENik;
+          conditionApproval += `WHERE I_ID_LDAR = :id AND I_LDAR_APRV != :PENik`;
+        } else if (values.toStatus < 4) {
+          conditionApproval += `WHERE I_ID_LDAR = :id `;
+        }
+        // console.log(
+        //   sql.ldar.approval.delete_admin + conditionApproval,
+        //   valApprove,
+        // );
+        let approval = await this.db
+          .execute(
+            "dbapdm",
+            sql.ldar.approval.delete_admin + conditionApproval,
+            valApprove,
+            {
+              autoCommit: true,
+            },
+          )
+          .catch((err) => {
+            throw err;
+          });
+      }
+    } else {
+      let updatedLdar =
+        " SET D_LDAR_STAT = CURRENT_DATE, I_UPDATE = :updateUser,	D_UPDATE = CURRENT_DATE, C_LDAR_STAT = :toStatus";
+      switch (values.toStatus) {
+        case "1":
+          valLDAR.toStatus = 1;
+          break;
+        case "2":
+          valLDAR.toStatus = 2;
+          break;
+        case "3":
+          valLDAR.toStatus = 3;
+          break;
+        case "4":
+          valLDAR.toStatus = 4;
+          break;
+        case "4.1":
+          valLDAR.toStatus = 4;
+          break;
+        case "5":
+          valLDAR.toStatus = 5;
+          break;
+        case "6":
+          valLDAR.toStatus = 6;
+          break;
+        case "9":
+          valLDAR.toStatus = 9;
+          break;
+        case "10":
+          valLDAR.toStatus = 10;
+          break;
+        case "11":
+          valLDAR.toStatus = 11;
+          break;
+        default:
+          // tidak ada tambahan
+          break;
+      }
+
+      let ldar = await this.db
+        .execute(
+          "dbapdm",
+          sql.ldar.update_status_admin + updatedLdar + conditionLdar,
+          valLDAR,
+          {
+            autoCommit: true,
+          },
+        )
+        .then(
+          async () =>
+            (
+              await this.get(
+                values.id,
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                headers.authorization,
+              )
+            )[0],
         )
         .catch((err) => {
           throw err;

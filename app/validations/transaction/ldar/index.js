@@ -1333,7 +1333,7 @@ exports.update_status_admin = [
         MessageProvider.message(
           Messages.KEYS.IN,
           "Status",
-          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to CE/PE; 3 = Received by CE/PE; 4 = Assigned to PL/DE; 4.1 = Approved by PL/DE; 5 = Approved by CE/PE; 6 = Rejected by CE/PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed (Accepted); 10 = Closed (Rejected); 11 = Closed by the admin (Accepted); 12 = Closed by the admin (Rejected);",
+          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to CE/PE; 3 = Received by CE/PE; 4 = Assigned to PL/DE; 4.1 = Approved by PL/DE; 5 = Approved by CE/PE; 6 = Rejected by CE/PE; 9 = Closed (Accepted); 10 = Closed (Rejected); 11 = Closed by the admin (Accepted); 12 = Closed by the admin (Rejected);",
         ),
     ),
   body("fromStatus")
@@ -1355,14 +1355,14 @@ exports.update_status_admin = [
       let valid = true;
       console.log(val);
 
-      valid = val > req.body.toStatus;
+      valid = val != req.body.toStatus;
       console.log(val, req.body.toStatus, valid);
 
       if (!valid) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
             "|" +
-            "Status tujuan harus lebih kecil dari status awal",
+            "Status tujuan tidak boleh sama dengan status awal",
         );
       }
       return true;
