@@ -1351,12 +1351,20 @@ exports.update_status_admin = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Status Awal", 3),
     )
     .bail()
+    .isIn(["0", "1", "2", "3", "4", "4.1", "5", "6", "9", "10", "11", "12"])
+    .withMessage(
+      MessageProvider.status(Messages.KEYS.IN) +
+        "|" +
+        MessageProvider.message(
+          Messages.KEYS.IN,
+          "Status",
+          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to CE/PE; 3 = Received by CE/PE; 4 = Assigned to PL/DE; 4.1 = Approved by PL/DE; 5 = Approved by CE/PE; 6 = Rejected by CE/PE; 9 = Closed (Accepted); 10 = Closed (Rejected); 11 = Closed by the admin (Accepted); 12 = Closed by the admin (Rejected);",
+        ),
+    )
+    .bail()
     .custom(async (val, { req }) => {
       let valid = true;
-      console.log(val);
-
       valid = val != req.body.toStatus;
-      console.log(val, req.body.toStatus, valid);
 
       if (!valid) {
         throw new Error(

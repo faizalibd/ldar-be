@@ -614,8 +614,8 @@ class LDARRepository {
   }
 
   async updateStatusAdmin({ body: values, headers }) {
-    console.log(values);
-
+    // console.log(values);
+    let ldar = "";
     let valLDAR = {
       id: values.id,
       updateUser: values.updateUser,
@@ -623,8 +623,6 @@ class LDARRepository {
     let valApprove = {
       id: values.id,
     };
-    let updatedFile = " ";
-    let updatedDrawing = " ";
     let conditionLdar = " WHERE i_id_ldar = :id";
     let conditionApproval = " ";
 
@@ -673,7 +671,7 @@ class LDARRepository {
           break;
       }
 
-      let ldar = await this.db
+      ldar = await this.db
         .execute(
           "dbapdm",
           sql.ldar.update_status_admin + updatedLdar + conditionLdar,
@@ -779,7 +777,7 @@ class LDARRepository {
           break;
       }
 
-      let ldar = await this.db
+      ldar = await this.db
         .execute(
           "dbapdm",
           sql.ldar.update_status_admin + updatedLdar + conditionLdar,
