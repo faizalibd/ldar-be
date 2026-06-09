@@ -61,7 +61,7 @@ class ApprovalRepository {
         await this.db.execute(
           "dbapdm",
           sql.ldar.approval.select + condition + orderby + rows,
-          values
+          values,
         )
       ).rows.map(async (r) => {
         let employee = employees.filter((employee) => {
@@ -69,7 +69,7 @@ class ApprovalRepository {
         });
         r.nama = employee && employee.length > 0 ? employee[0].nama : "-";
         return r;
-      })
+      }),
     );
   }
 
@@ -105,18 +105,18 @@ class ApprovalRepository {
       await this.db.execute(
         "dbapdm",
         sql.ldar.approval.exists + condition,
-        values
+        values,
       )
     ).rows[0].ct;
   }
 
   // INI FUNGSI UNTUK ADD DE DOANG CUY
   async add({ body: values }) {
-    let result = this.add_func(values);
+    let result = await this.add_func(values);
     let from = process.env.EMAIL_FROM;
     let to = (await api.info.employee.get(values.nik))[0].email;
     let cc;
-    let subject = "Email to DE (Assigned DE)";
+    let subject = `LDAR No. ${result.number} has been Assigned to PL/DE `;
     let text = `PLEASE REVIEW THE ATTACHED REQUEST problem and record your disposition.`;
 
     if (process.env.EMAIL == "FALSE") {
