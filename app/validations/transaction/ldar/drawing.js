@@ -13,21 +13,21 @@ exports.add = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "LDAR ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "LDAR ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR ID", 5),
     )
     .bail()
     .custom(async (val) => {
@@ -39,7 +39,7 @@ exports.add = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR"),
         );
       }
 
@@ -61,7 +61,7 @@ exports.add = [
           "",
           "",
           "",
-          "4"
+          "4",
         )) == 1;
       if (!found) {
         throw new Error(
@@ -69,8 +69,8 @@ exports.add = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 4"
-            )
+              "LDAR with Status 4",
+            ),
         );
       }
 
@@ -85,13 +85,13 @@ exports.add = [
           "|" +
           MessageProvider.message(
             Messages.KEYS.NOT_EMPTY,
-            "Drawing Sheet & Drawing Number"
-          )
+            "Drawing Sheet & Drawing Number",
+          ),
       );
     } else if (val && req.body.drawingNumber) {
       throw new Error(
         MessageProvider.status(Messages.KEYS.UNPROCESSABLE_ENTITY) +
-          "|Do not enter the Drawing Sheet id and Drawing Number together "
+          "|Do not enter the Drawing Sheet id and Drawing Number together ",
       );
     }
 
@@ -103,20 +103,20 @@ exports.add = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Sheet")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Sheet"),
         );
       }
 
       found = await db.transaction.ldar.drawing.exists(
         "",
         req.body.LDARId,
-        val
+        val,
       );
       if (found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
             "|" +
-            MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "Drawing")
+            MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "Drawing"),
         );
       }
     }
@@ -132,8 +132,8 @@ exports.add = [
             MessageProvider.message(
               Messages.KEYS.MAX_LENGTH,
               "Drawing Number",
-              50
-            )
+              50,
+            ),
         );
       }
     }
@@ -144,19 +144,11 @@ exports.add = [
     let found;
 
     if (req.body.drawingNumber) {
-      if (!val) {
-        throw new Error(
-          MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
-            "|" +
-            MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ADCN/DCN")
-        );
-      }
-
       if (val.length > 5) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
             "|" +
-            MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN/DCN", 5)
+            MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN/DCN", 5),
         );
       }
 
@@ -169,13 +161,13 @@ exports.add = [
           "",
           "",
           "",
-          val
+          val,
         ));
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Number")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Number"),
         );
       }
 
@@ -184,13 +176,13 @@ exports.add = [
         req.body.LDARId,
         null,
         req.body.drawingNumber,
-        val
+        val,
       );
       if (found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.ALREADY_EXIST) +
             "|" +
-            MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "Drawing")
+            MessageProvider.message(Messages.KEYS.ALREADY_EXIST, "Drawing"),
         );
       }
     }
@@ -201,14 +193,14 @@ exports.add = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry"),
     )
     .bail()
     .isLength({ max: 6 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6),
     )
     .bail()
     .custom(async (val) => {
@@ -217,7 +209,7 @@ exports.add = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee"),
         );
       }
 
@@ -231,21 +223,21 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5),
     )
     .bail()
     .custom(async (val) => {
@@ -256,15 +248,13 @@ exports.update = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Drawing")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Drawing"),
         );
       }
 
       found =
         (await db.transaction.ldar.exists(
-          (
-            await db.transaction.ldar.drawing.get(val)
-          )[0].LDARId,
+          (await db.transaction.ldar.drawing.get(val))[0].LDARId,
           "",
           "",
           "",
@@ -280,7 +270,7 @@ exports.update = [
           "",
           "",
           "",
-          "4"
+          "4",
         )) == 1;
       if (!found) {
         throw new Error(
@@ -288,8 +278,8 @@ exports.update = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 4"
-            )
+              "LDAR with Status 4",
+            ),
         );
       }
 
@@ -300,28 +290,28 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ADCN / DCN")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ADCN / DCN"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN / DCN", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ADCN / DCN", 5),
     ),
   body("drawingNumber")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Number")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Number"),
     )
     .bail()
     .isLength({ max: 40 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Number", 40)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Number", 40),
     )
     .bail()
     .custom(async (val, { req }) => {
@@ -337,26 +327,24 @@ exports.update = [
           null,
           null,
           null,
-          adcn
+          adcn,
         ));
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Number")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Number"),
         );
       }
 
       found =
         (await db.transaction.ldar.drawing.exists(
           "",
-          (
-            await db.transaction.ldar.drawing.get(req.body.id)
-          )[0].LDARId,
+          (await db.transaction.ldar.drawing.get(req.body.id))[0].LDARId,
           val,
           "",
           "",
-          req.body.id
+          req.body.id,
         )) == 1;
       if (found) {
         throw new Error(
@@ -364,8 +352,8 @@ exports.update = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.ALREADY_EXIST,
-              "Drawing Number with this LDAR"
-            )
+              "Drawing Number with this LDAR",
+            ),
         );
       }
       return true;
@@ -375,14 +363,14 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Sheet")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Drawing Sheet"),
     )
     .bail()
     .isLength({ max: 3 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Sheet", 3)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Drawing Sheet", 3),
     )
     .bail()
     .custom(async (val, { req }) => {
@@ -396,13 +384,13 @@ exports.update = [
           null,
           null,
           val,
-          drawingNumber
+          drawingNumber,
         ));
       if (!found) {
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Sheet")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Drawing Sheet"),
         );
       }
       return true;
@@ -412,14 +400,14 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry"),
     )
     .bail()
     .isLength({ max: 6 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6),
     )
     .bail()
     .custom(async (val) => {
@@ -428,7 +416,7 @@ exports.update = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee"),
         );
       }
 
@@ -442,21 +430,21 @@ exports.delete = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5),
     )
     .bail()
     .custom(async (val) => {
@@ -465,7 +453,7 @@ exports.delete = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Drawing")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Drawing"),
         );
       }
 
