@@ -2,6 +2,7 @@
 *.key.pub
 !core/key/.gitkeep
 launch.json
+/etc
 
 # Logs
 logs

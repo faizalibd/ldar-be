@@ -15,13 +15,13 @@ exports.get = async (req, res) => {
       req.query.limit,
       req.query.offset,
       req.query.type,
-      req.query.number
+      req.query.number,
     );
     if (!result.length) {
       response.code = MessageProvider.status(Messages.KEYS.NOT_FOUND);
       response.message = MessageProvider.message(
         Messages.KEYS.NOT_FOUND,
-        "SAP"
+        "SAP",
       );
     } else {
       response.data = result.length == 1 ? result[0] : result;
@@ -31,7 +31,40 @@ exports.get = async (req, res) => {
     response.code = MessageProvider.status(Messages.KEYS.ERROR);
     response.message = `${MessageProvider.message(
       Messages.KEYS.ERROR,
-      "SAP"
+      "SAP",
+    )} ${error.message || error}`;
+  }
+  res.status(response.code).json(response);
+};
+
+exports.getElr = async (req, res) => {
+  let response = {
+    code: MessageProvider.status(Messages.KEYS.SUCCESS),
+    total_data: 0,
+    data: null,
+    message: MessageProvider.message(Messages.KEYS.SUCCESS),
+  };
+  try {
+    const result = await db.transaction.sap.getElr(
+      req.query.limit,
+      req.query.offset,
+      req.query.number,
+    );
+    if (!result.length) {
+      response.code = MessageProvider.status(Messages.KEYS.NOT_FOUND);
+      response.message = MessageProvider.message(
+        Messages.KEYS.NOT_FOUND,
+        "SAP",
+      );
+    } else {
+      response.data = result.length == 1 ? result[0] : result;
+      response.total_data = result.length;
+    }
+  } catch (error) {
+    response.code = MessageProvider.status(Messages.KEYS.ERROR);
+    response.message = `${MessageProvider.message(
+      Messages.KEYS.ERROR,
+      "SAP",
     )} ${error.message || error}`;
   }
   res.status(response.code).json(response);
