@@ -58,6 +58,7 @@ module.exports = {
         exists: sql("/transaction/ldar/approval/exists.sql"),
         insert: sql("/transaction/ldar/approval/insert.sql"),
         update: sql("/transaction/ldar/approval/update.sql"),
+        update_typecode: sql("/transaction/ldar/approval/update_typecode.sql"),
         delete: sql("/transaction/ldar/approval/delete.sql"),
         delete_admin: sql("/transaction/ldar/approval/delete_admin.sql"),
       },

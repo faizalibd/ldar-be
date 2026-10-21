@@ -714,7 +714,18 @@ class LDARRepository {
           throw err;
         });
 
-      if (values.fromStatus > 3) {
+      // cek data ldar sudah masuk table approval
+      if (values.fromStatus == 4.1 && values.fromStatus == 4) {
+        // akses PL/DE untuk review dibuka kembali oleh CE/PE
+        valApprove.typeCode = 0;
+        let approval = await this.db
+          .execute("dbapdm", sql.ldar.approval.update_typecode, valApprove, {
+            autoCommit: true,
+          })
+          .catch((err) => {
+            throw err;
+          });
+      } else if (values.fromStatus > 3) {
         if (values.toStatus == 4) {
           valApprove.PENik = ldar.PENik;
           conditionApproval += `WHERE I_ID_LDAR = :id AND I_LDAR_APRV != :PENik`;
