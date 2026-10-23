@@ -1014,6 +1014,9 @@ exports.update_status = [
         case "10":
           allowed = "5,6,7,8";
           break;
+        case "11":
+          allowed = "5,6,7,8";
+          break;
       }
       found =
         (await db.transaction.ldar.exists(
@@ -1133,14 +1136,14 @@ exports.update_status = [
         MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Status", 1),
     )
     .bail()
-    .isIn(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
+    .isIn(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"])
     .withMessage(
       MessageProvider.status(Messages.KEYS.IN) +
         "|" +
         MessageProvider.message(
           Messages.KEYS.IN,
           "Status",
-          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed; 10 = Closed ",
+          "0 = Created; 1 = Submit to AWO Panel 0; 2 = Submit to PE; 3 = Received by PE; 4 = Assigned to DE; 5 = Approved by PE; 6 = Rejected by PE; 7 = Accepted by AWO Panel; 8 = Rejected by AWO Panel; 9 = Closed; 10 = Closed, 11 = Waiting Drawing Revision ",
         ),
     ),
   body("nik").custom(async (val, { req }) => {
