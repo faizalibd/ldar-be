@@ -993,10 +993,10 @@ exports.update_status = [
           user = "DE";
           break;
         case "5":
-          allowed = "4";
+          allowed = "3,4";
           break;
         case "6":
-          allowed = "4";
+          allowed = "3,4";
           break;
         case "7":
           ref = "3";
