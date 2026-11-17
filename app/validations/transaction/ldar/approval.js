@@ -11,21 +11,21 @@ exports.add_awop = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "LDAR ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "LDAR ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR ID", 5),
     )
     .bail()
     .custom(async (val, { req }) => {
@@ -49,7 +49,7 @@ exports.add_awop = [
           "",
           "",
           "",
-          "5"
+          "5",
         )) == 1;
       if (!found) {
         throw new Error(
@@ -57,8 +57,8 @@ exports.add_awop = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 5 and ELR Document"
-            )
+              "LDAR with Status 5 and ELR Document",
+            ),
         );
       }
 
@@ -69,14 +69,14 @@ exports.add_awop = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK"),
     )
     .bail()
     .isLength({ max: 6 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6),
     )
     .bail()
     .custom(async (val, { req }) => {
@@ -90,8 +90,8 @@ exports.add_awop = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.ALREADY_EXIST,
-              "LDAR Approval"
-            )
+              "LDAR Approval",
+            ),
         );
       }
 
@@ -102,7 +102,7 @@ exports.add_awop = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Employee (AWOP)"),
         );
       }
       return true;
@@ -112,14 +112,14 @@ exports.add_awop = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry"),
     )
     .bail()
     .isLength({ max: 6 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6),
     ),
 ];
 
@@ -129,21 +129,21 @@ exports.add = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "LDAR ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "LDAR ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "LDAR ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "LDAR ID", 5),
     )
     .bail()
     .custom(async (val) => {
@@ -155,7 +155,7 @@ exports.add = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR"),
         );
       }
 
@@ -177,7 +177,7 @@ exports.add = [
           "",
           "",
           "",
-          "4"
+          "3,4",
         )) == 1;
       if (!found) {
         throw new Error(
@@ -185,8 +185,8 @@ exports.add = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 4"
-            )
+              "LDAR with Status 3 OR 4",
+            ),
         );
       }
 
@@ -197,28 +197,28 @@ exports.add = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "NIK"),
     )
     .bail()
     .isLength({ max: 6 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "NIK", 6),
     ),
   body("entry")
     .notEmpty()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry"),
     )
     .bail()
     .isLength({ max: 6 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6),
     ),
 ];
 
@@ -228,21 +228,21 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5),
     )
     .bail()
     .custom(async (val) => {
@@ -254,15 +254,13 @@ exports.update = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval"),
         );
       }
 
       found =
         (await db.transaction.ldar.exists(
-          (
-            await db.transaction.ldar.approval.get(val)
-          )[0].LDARId,
+          (await db.transaction.ldar.approval.get(val))[0].LDARId,
           "",
           "",
           "",
@@ -278,7 +276,7 @@ exports.update = [
           "",
           "",
           "",
-          "4"
+          "4",
         )) == 1;
       if (!found) {
         throw new Error(
@@ -286,8 +284,8 @@ exports.update = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR with Status 4"
-            )
+              "LDAR with Status 4",
+            ),
         );
       }
 
@@ -298,14 +296,14 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Approval Type Code")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Approval Type Code"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "Approval Type Code")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "Approval Type Code"),
     )
     .bail()
     .isLength({ max: 5 })
@@ -315,8 +313,8 @@ exports.update = [
         MessageProvider.message(
           Messages.KEYS.MAX_LENGTH,
           "Approval Type Code",
-          5
-        )
+          5,
+        ),
     )
     .bail()
     .custom(async (val, { req }) => {
@@ -327,7 +325,7 @@ exports.update = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Approval Type")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "Approval Type"),
         );
       }
 
@@ -339,7 +337,7 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Remark", 1000)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Remark", 1000),
     ),
   check("file").custom(async (val, { req }) => {
     let valid = false;
@@ -348,7 +346,7 @@ exports.update = [
       throw new Error(
         MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
           "|" +
-          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "File", 250)
+          MessageProvider.message(Messages.KEYS.MAX_LENGTH, "File", 250),
       );
     }
 
@@ -359,14 +357,14 @@ exports.update = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "Entry"),
     )
     .bail()
     .isLength({ max: 6 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "Entry", 6),
     ),
 ];
 
@@ -376,21 +374,21 @@ exports.delete = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5),
     )
     .bail()
     .custom(async (val) => {
@@ -402,8 +400,8 @@ exports.delete = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR Approval with Approval Type 0"
-            )
+              "LDAR Approval with Approval Type 0",
+            ),
         );
       }
 
@@ -417,21 +415,21 @@ exports.download = [
     .withMessage(
       MessageProvider.status(Messages.KEYS.NOT_EMPTY) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID")
+        MessageProvider.message(Messages.KEYS.NOT_EMPTY, "ID"),
     )
     .bail()
     .isNumeric()
     .withMessage(
       MessageProvider.status(Messages.KEYS.NUMERIC) +
         "|" +
-        MessageProvider.message(Messages.KEYS.NUMERIC, "ID")
+        MessageProvider.message(Messages.KEYS.NUMERIC, "ID"),
     )
     .bail()
     .isLength({ max: 5 })
     .withMessage(
       MessageProvider.status(Messages.KEYS.MAX_LENGTH) +
         "|" +
-        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5)
+        MessageProvider.message(Messages.KEYS.MAX_LENGTH, "ID", 5),
     )
     .bail()
     .custom(async (val) => {
@@ -442,7 +440,7 @@ exports.download = [
         throw new Error(
           MessageProvider.status(Messages.KEYS.NOT_FOUND) +
             "|" +
-            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval")
+            MessageProvider.message(Messages.KEYS.NOT_FOUND, "LDAR Approval"),
         );
       }
 
@@ -453,8 +451,8 @@ exports.download = [
             "|" +
             MessageProvider.message(
               Messages.KEYS.NOT_FOUND,
-              "LDAR Approval File"
-            )
+              "LDAR Approval File",
+            ),
         );
       }
 
